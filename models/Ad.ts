@@ -1,5 +1,5 @@
 
-import { Schema, model, Document, Types, PaginateModel } from 'mongoose';
+import mongoose, { Schema, model, Document, Types } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 // Interface pour le document Ad
@@ -14,9 +14,6 @@ export interface IAd extends Document {
     createdAt: Date;
     status: 'pending' | 'approved' | 'rejected';
 }
-
-// Interface pour le modèle Ad avec pagination
-interface IAdModel extends PaginateModel<IAd> {}
 
 const AdSchema = new Schema<IAd>({
     title: { type: String, required: true, trim: true },
@@ -37,7 +34,8 @@ const AdSchema = new Schema<IAd>({
 // Appliquer le plugin de pagination au schéma
 AdSchema.plugin(mongoosePaginate);
 
-// Utiliser l'interface IAdModel pour le typage du modèle
-const Ad = model<IAd, IAdModel>('Ad', AdSchema);
+// L'astuce est de faire un "cast" du modèle pour inclure le type de pagination
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Ad = model<IAd, mongoose.PaginateModel<IAd>>('Ad', AdSchema, "ads" as any);
 
 export default Ad;

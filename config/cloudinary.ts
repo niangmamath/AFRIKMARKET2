@@ -1,7 +1,9 @@
+
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
 import './env'; // Load environment variables
+import { Request } from 'express';
 
 // Configure Cloudinary with credentials from environment variables
 cloudinary.config({
@@ -14,7 +16,7 @@ cloudinary.config({
 // Configure Multer to use Cloudinary for storage
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: async (req, file) => {
+    params: async (req: Request, file: Express.Multer.File) => {
         // You can add folder and format logic here
         return {
             folder: 'leboncoin', // Folder name on Cloudinary
