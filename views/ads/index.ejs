@@ -1,0 +1,92 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <%- include('../partials/flash-messages') %>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900"><%= title %></h1>
+        <a href="/ads/new" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Créer une annonce
+        </a>
+    </div>
+
+    <% if(ads.length > 0) { %>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <% ads.forEach(ad => { %>
+                <a href="/ads/<%= ad._id %>" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out overflow-hidden">
+                    <div class="h-48 bg-gray-200 flex items-center justify-center">
+                        <% if (ad.imageUrl) { %>
+                            <img src="<%= ad.imageUrl %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
+                        <% } else { %>
+                            <span class="text-gray-500">Pas d'image</span>
+                        <% } %>
+                    </div>
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 truncate"><%= ad.title %></h2>
+                        <p class="text-2xl font-bold text-indigo-600 my-2"><%= ad.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) %></p>
+                        <% if (ad.location) { %>
+                            <p class="text-sm text-gray-600 flex items-center mt-3">
+                                <svg class="h-4 w-4 mr-1.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                <%= ad.location %>
+                            </p>
+                        <% } %>
+                        <div class="border-t border-gray-200 mt-4 pt-4">
+                            <p class="text-xs text-gray-500">Posté par <span class="font-medium text-gray-600"><%= ad.author ? ad.author.username : 'Utilisateur inconnu' %></span></p>
+                        </div>
+                    </div>
+                </a>
+            <% }) %>
+        </div>
+
+        <!-- Pagination Controls -->
+        <% if (totalPages > 1) { %>
+            <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-12">
+                <div class="flex flex-1 justify-between sm:hidden">
+                    <a href="/ads?page=<%= prevPage %>" class="<%= !hasPrevPage ? 'pointer-events-none text-gray-400' : 'text-indigo-600 hover:text-indigo-800' %> relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium">
+                        Précédent
+                    </a>
+                    <a href="/ads?page=<%= nextPage %>" class="<%= !hasNextPage ? 'pointer-events-none text-gray-400' : 'text-indigo-600 hover:text-indigo-800' %> relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium">
+                        Suivant
+                    </a>
+                </div>
+                <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                    <div>
+                         <p class="text-sm text-gray-700">
+                            Page <span class="font-medium"><%= currentPage %></span> sur <span class="font-medium"><%= totalPages %></span>
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                            <a href="/ads?page=<%= prevPage %>" class="<%= !hasPrevPage ? 'pointer-events-none text-gray-400' : 'text-gray-500 hover:bg-gray-50' %> relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0">
+                                <span class="sr-only">Précédent</span>
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" /></svg>
+                            </a>
+                            <!-- Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" -->
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <a href="/ads?page=<%= i %>" class="<%= currentPage === i ? 'z-10 bg-indigo-600 text-white' : 'text-gray-900 hover:bg-gray-50' %> relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0">
+                                    <%= i %>
+                                </a>
+                            <% } %>
+                            <a href="/ads?page=<%= nextPage %>" class="<%= !hasNextPage ? 'pointer-events-none text-gray-400' : 'text-gray-500 hover:bg-gray-50' %> relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0">
+                                <span class="sr-only">Suivant</span>
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" /></svg>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+
+    <% } else { %>
+        <div class="text-center bg-white py-12 px-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-gray-900">Aucune annonce pour le moment</h3>
+            <p class="mt-1 text-sm text-gray-500">Soyez le premier à en créer une !</p>
+            <div class="mt-6">
+                <a href="/ads/new" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                    Créer une annonce
+                </a>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,65 @@
+<div class="max-w-7xl mx-auto">
+
+    <!-- Page Header -->
+    <div class="sm:flex sm:items-center sm:justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">Gestion du Blog</h1>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Créez, modifiez et supprimez les articles du blog.</p>
+        </div>
+        <div class="flex items-center space-x-3 mt-4 sm:mt-0">
+            <a href="/admin" class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">
+                 <i class="fas fa-arrow-left mr-2"></i>
+                Retour
+            </a>
+            <a href="/admin/blog/new" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-600">+ Nouvel Article</a>
+        </div>
+    </div>
+
+    <!-- Blog Posts Table -->
+    <div class="admin-table-container">
+        <div class="responsive-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Auteur</th>
+                        <th>Créé le</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (blogs.length > 0) { %>
+                        <% blogs.forEach(blog => { %>
+                            <tr>
+                                <td>
+                                    <span class="font-semibold text-gray-800 dark:text-gray-200"><%= blog.title %></span>
+                                </td>
+                                <td class="text-gray-600 dark:text-gray-400">
+                                    <%= blog.author ? blog.author.username : 'N/A' %>
+                                </td>
+                                <td class="text-gray-600 dark:text-gray-400">
+                                    <%= new Date(blog.createdAt).toLocaleDateString('fr-FR') %>
+                                </td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <a href="/admin/blog/<%= blog._id %>/edit" class="action-btn btn-secondary">Modifier</a>
+                                        <form action="/admin/blog/<%= blog._id %>/delete?_method=POST" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                            <button type="submit" class="action-btn btn-danger">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="text-center py-10">
+                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Aucun article trouvé</h2>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Il n'y a aucun article de blog à afficher pour le moment.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

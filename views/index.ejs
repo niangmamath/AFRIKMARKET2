@@ -1,9 +1,90 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="/styles.css" />
-</head>
-<body>
-    <h1>Hello world</h1>
-</body>
-</html>
+<%- include('./partials/header') %>
+
+<div class="bg-white">
+
+    <!-- Hero Section -->
+    <div class="relative bg-gray-900">
+        <div aria-hidden="true" class="absolute inset-0 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop" alt="Team working" class="h-full w-full object-cover object-center">
+        </div>
+        <div aria-hidden="true" class="absolute inset-0 bg-gray-900 opacity-50"></div>
+
+        <div class="relative mx-auto flex max-w-3xl flex-col items-center px-6 py-32 text-center sm:py-64 lg:px-0">
+            <h1 class="text-4xl font-bold tracking-tight text-white lg:text-6xl">Bienvenue sur AfrikMarket</h1>
+            <p class="mt-4 text-xl text-white">Votre nouvelle plateforme pour acheter et vendre des produits de qualité à travers le continent.</p>
+            <a href="/ads" class="mt-8 inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700">Voir les annonces</a>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <div class="bg-gray-50 py-24 sm:py-32">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:text-center">
+                <h2 class="text-base font-semibold leading-7 text-indigo-600">Nos Services</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Tout ce dont vous avez besoin pour vendre et acheter</p>
+                <p class="mt-6 text-lg leading-8 text-gray-600">
+                    Nous offrons une plateforme simple, sécurisée et efficace pour connecter les vendeurs et les acheteurs.
+                </p>
+            </div>
+            <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+                <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
+                    <div class="relative pl-16">
+                        <dt class="text-base font-semibold leading-7 text-gray-900">
+                            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg>
+                            </div>
+                            Vente Simplifiée
+                        </dt>
+                        <dd class="mt-2 text-base leading-7 text-gray-600">Créez une annonce en quelques minutes et touchez des milliers d'acheteurs potentiels.</dd>
+                    </div>
+                    <div class="relative pl-16">
+                        <dt class="text-base font-semibold leading-7 text-gray-900">
+                            <div class="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </div>
+                            Transactions Sécurisées
+                        </dt>
+                        <dd class="mt-2 text-base leading-7 text-gray-600">Nous mettons un point d'honneur à la sécurité de vos informations et de vos paiements.</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Recent Ads Section -->
+    <% if (recentAds && recentAds.length > 0) { %>
+    <div class="bg-white">
+        <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold tracking-tight text-gray-900">Annonces Récentes</h2>
+                <a href="/ads" class="text-indigo-600 hover:text-indigo-500 font-semibold">Voir tout <span aria-hidden="true">&rarr;</span></a>
+            </div>
+            
+            <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+                <% recentAds.forEach(ad => { %>
+                <div class="group relative">
+                    <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+                        <img src="<%= ad.imageUrl ? ad.imageUrl : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>" alt="<%= ad.title %>" class="h-full w-full object-cover object-center lg:h-full lg:w-full">
+                    </div>
+                    <div class="mt-4 flex justify-between">
+                        <div>
+                            <h3 class="text-sm text-gray-700">
+                                <a href="/ads/<%= ad._id %>">
+                                    <span aria-hidden="true" class="absolute inset-0"></span>
+                                    <%= ad.title %>
+                                </a>
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500"><%= ad.category %></p>
+                        </div>
+                        <p class="text-sm font-medium text-gray-900"><%= ad.price %> €</p>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<%- include('./partials/footer') %>

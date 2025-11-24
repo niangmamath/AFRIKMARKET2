@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2">
+            <!-- Image Section -->
+            <div class="bg-gray-200 flex items-center justify-center">
+                <% if (ad.imageUrl) { %>
+                    <img src="<%= ad.imageUrl %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
+                <% } else { %>
+                    <div class="h-96 flex items-center justify-center">
+                        <span class="text-gray-500">Pas d'image disponible</span>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Details Section -->
+            <div class="p-8 flex flex-col justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900 mb-2"><%= ad.title %></h1>
+                    <p class="text-4xl font-extrabold text-indigo-600 mb-6"><%= ad.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) %></p>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-800 border-b border-gray-200 pb-2 mb-3">Description</h3>
+                        <p class="text-gray-600 whitespace-pre-wrap"><%= ad.description %></p>
+                    </div>
+
+                    <div class="space-y-3 text-sm">
+                         <% if (ad.category) { %>
+                            <p class="text-gray-700"><strong class="font-medium text-gray-900">Catégorie :</strong> <%= ad.category %></p>
+                        <% } %>
+                        <% if (ad.location) { %>
+                            <p class="text-gray-700"><strong class="font-medium text-gray-900">Lieu :</strong> <%= ad.location %></p>
+                        <% } %>
+                        <p class="text-gray-700"><strong class="font-medium text-gray-900">Posté le :</strong> <%= new Date(ad.createdAt).toLocaleDateString('fr-FR') %></p>
+                         <p class="text-gray-700"><strong class="font-medium text-gray-900">Auteur :</strong> <%= ad.author ? ad.author.username : 'Utilisateur inconnu' %></p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <% if (isAuthor) { %>
+                    <div class="mt-8 border-t border-gray-200 pt-6 flex items-center space-x-4">
+                        <a href="/ads/<%= ad._id %>/edit" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 w-full">
+                            Modifier l'annonce
+                        </a>
+                        <form action="/ads/<%= ad._id %>?_method=DELETE" method="POST" class="w-full">
+                            <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');" class="inline-flex items-center justify-center px-5 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 w-full">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

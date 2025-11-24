@@ -1,0 +1,122 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <!-- Colonne de mise à jour du profil -->
+        <div class="md:col-span-1">
+            <div class="px-4 sm:px-0">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Profil</h3>
+                <p class="mt-1 text-sm text-gray-600">
+                    Mettez à jour les informations de votre profil et votre adresse e-mail.
+                </p>
+            </div>
+        </div>
+        <div class="mt-5 md:mt-0 md:col-span-2">
+            <form action="/profile?_method=PUT" method="POST" enctype="multipart/form-data">
+                <div class="shadow sm:rounded-md sm:overflow-hidden">
+                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                        <!-- Champ Nom d'utilisateur -->
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                            <input type="text" name="username" id="username" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="<%= user.username %>">
+                        </div>
+
+                        <!-- Champ Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+                            <input type="email" name="email" id="email" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="<%= user.email %>">
+                        </div>
+
+                        <!-- Champ Photo de profil -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Photo de profil</label>
+                            <div class="mt-1 flex items-center">
+                                <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                                    <img id="profile-image-preview" src="<%= user.profileImageUrl ? user.profileImageUrl : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>" alt="Photo de profil" class="h-full w-full object-cover">
+                                </span>
+                                <input type="file" name="profileImage" id="profileImage" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Enregistrer
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Séparateur -->
+    <div class="hidden sm:block" aria-hidden="true">
+        <div class="py-5">
+            <div class="border-t border-gray-200"></div>
+        </div>
+    </div>
+
+    <!-- Section Mes Annonces -->
+    <div class="mt-10 sm:mt-0">
+        <div class="md:grid md:grid-cols-3 md:gap-6">
+            <div class="md:col-span-1">
+                <div class="px-4 sm:px-0">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Mes Annonces</h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Gérez les annonces que vous avez publiées.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-5 md:mt-0 md:col-span-2">
+                <div class="bg-white shadow overflow-hidden sm:rounded-md">
+                    <ul class="divide-y divide-gray-200">
+                        <% if(ads.length > 0) { %>
+                            <% ads.forEach(ad => { %>
+                                <li>
+                                    <a href="/ads/<%= ad._id %>" class="block hover:bg-gray-50">
+                                        <div class="flex items-center px-4 py-4 sm:px-6">
+                                            <div class="min-w-0 flex-1 flex items-center">
+                                                <div class="flex-shrink-0">
+                                                    <img class="h-12 w-12 rounded-md" src="<%= ad.imageUrl ? ad.imageUrl : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>" alt="">
+                                                </div>
+                                                <div class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
+                                                    <div>
+                                                        <p class="text-sm font-medium text-indigo-600 truncate"><%= ad.title %></p>
+                                                        <p class="mt-2 flex items-center text-sm text-gray-500">
+                                                            <span class="truncate"><%= ad.category %></span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="hidden md:block">
+                                                        <div>
+                                                            <p class="text-sm text-gray-900">
+                                                                Prix: <%= ad.price %> €
+                                                            </p>
+                                                            <p class="mt-2 text-sm text-gray-500">
+                                                                Publiée le <%= new Date(ad.createdAt).toLocaleDateString() %>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <!-- Chevron -->
+                                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            <% }) %>
+                        <% } else { %>
+                            <li class="px-4 py-4 sm:px-6">
+                                Vous n'avez encore posté aucune annonce.
+                            </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

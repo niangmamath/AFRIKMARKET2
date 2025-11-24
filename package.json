@@ -2,23 +2,48 @@
   "name": "node-express-web-ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --watch --ext 'ts,json' --exec 'npm run build && npm run start'",
-    "build": "tsc && cp -r views dist",
-    "start": "node dist/index.js"
+    "dev": "concurrently \"npm:dev:*\"",
+    "dev:build:ts": "tsc -w --preserveWatchOutput",
+    "dev:build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
+    "dev:run": "nodemon --signal SIGINT",
+    "build": "npm run build:css && tsc && cp -r views dist && cp -r public dist",
+    "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css",
+    "start": "npm run build && node ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ejs": "^3.1.9",
-    "express": "^4.21.2"
+    "@types/connect-flash": "^0.0.40",
+    "@types/method-override": "^3.0.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^1.41.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.3.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.5.1",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
-    "typescript": "^5.3.2",
-    "@types/node": "^20.10.0",
-    "nodemon": "^3.0.1"
+    "@types/express-session": "^1.18.0",
+    "@types/node": "^20.14.9",
+    "@types/passport": "^1.0.16",
+    "@types/passport-local": "^1.0.38",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.4",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.3"
   }
 }

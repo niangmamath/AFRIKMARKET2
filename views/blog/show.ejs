@@ -1,0 +1,49 @@
+<%- include('../partials/header', { title: post.title }) %>
+
+<div class="bg-white py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- En-tête de l'article -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900"><%= post.title %></h1>
+            <div class="mt-6 flex justify-center items-center">
+                <div class="flex-shrink-0">
+                    <img class="h-12 w-12 rounded-full" src="<%= post.author && post.author.profileImageUrl ? post.author.profileImageUrl : '/images/default-avatar.png' %>" alt="Avatar de l'auteur">
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">
+                        Par <%= post.author ? post.author.username : 'Auteur inconnu' %>
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Publié le <%= new Date(post.createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image de couverture -->
+        <% if (post.imageUrl) { %>
+            <div class="mb-12 rounded-lg overflow-hidden shadow-lg">
+                <img class="w-full h-auto object-cover" src="<%= post.imageUrl %>" alt="Image pour <%= post.title %>">
+            </div>
+        <% } %>
+
+        <!-- Contenu de l'article -->
+        <div class="prose prose-indigo prose-lg text-gray-500 mx-auto">
+            <%- post.content %>
+        </div>
+
+        <!-- Bouton de retour -->
+        <div class="mt-16 text-center">
+            <a href="/blog" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Retour au blog
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

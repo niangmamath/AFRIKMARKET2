@@ -1,0 +1,7 @@
+{
+  "watch": ["dist"],
+  "exec": "node dist/index.js",
+  "ext": "js,json",
+  "delay": 1000,
+  "legacyWatch": true
+}

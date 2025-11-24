@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow-md rounded-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6"><%= title %></h1>
+        
+        <form action="/ads/<%= ad._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+            <div class="space-y-6">
+                <!-- Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Titre</label>
+                    <input type="text" id="title" name="title" value="<%= ad.title %>" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea id="description" name="description" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"><%= ad.description %></textarea>
+                </div>
+
+                <!-- Price -->
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Prix</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" id="price" name="price" value="<%= ad.price %>" required step="0.01" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">€</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Category & Location -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">Catégorie</lebel>
+                        <input type="text" id="category" name="category" value="<%= ad.category %>" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="location" class="block text-sm font-medium text-gray-700">Lieu</label>
+                        <input type="text" id="location" name="location" value="<%= ad.location %>" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+
+                <!-- Image Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Image actuelle</label>
+                    <div class="mt-2 flex items-center space-x-4">
+                        <% if (ad.imageUrl) { %>
+                            <img src="<%= ad.imageUrl %>" alt="Aperçu" class="h-24 w-24 object-cover rounded-md bg-gray-100">
+                        <% } else { %>
+                            <div class="h-24 w-24 flex items-center justify-center bg-gray-100 rounded-md text-sm text-gray-500">Pas d'image</div>
+                        <% } %>
+                        <div>
+                             <label for="image" class="block text-sm font-medium text-gray-700">Changer l'image</label>
+                            <input type="file" id="image" name="image" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="border-t border-gray-200 mt-8 pt-5">
+                <div class="flex justify-end space-x-3">
+                    <a href="/ads/<%= ad._id %>" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Annuler</a>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Mettre à jour</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

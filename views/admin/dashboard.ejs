@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-gray-100 dark:bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Tableau de bord</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+</head>
+<body class="h-full">
+    <div class="min-h-full">
+        <header class="bg-white dark:bg-gray-800 shadow-sm">
+            <div x-data="{ open: false }" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 justify-between">
+                    <div class="flex">
+                        <div class="flex flex-shrink-0 items-center">
+                            <a href="/admin" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Admin</a>
+                        </div>
+                        <div class="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="/admin/users" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Utilisateurs</a>
+                            <a href="/admin/ads" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Annonces</a>
+                            <a href="/admin/blog" class="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Blog</a>
+                        </div>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                        <button @click="document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';" class="rounded-full p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-white">
+                            <i class="fas fa-sun dark:hidden"></i>
+                            <i class="fas fa-moon hidden dark:inline"></i>
+                        </button>
+                        <% if (locals.user) { %>
+                            <div x-data="{ open: false }" class="relative ml-3">
+                                <div>
+                                    <button @click="open = !open" type="button" class="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                                            <span class="font-medium text-gray-600 dark:text-gray-300"><%= user.username.charAt(0).toUpperCase() %></span>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div x-show="open" @click.away="open = false" class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                                    <a href="/" class="block px-4 py-2 text-sm text-gray-700">Retour au site</a>
+                                    <form action="/auth/logout" method="POST">
+                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700">Déconnexion</button>
+                                    </form>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="-mr-2 flex items-center sm:hidden">
+                        <button @click="open = !open" type="button" class="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Aperçu des statistiques et des activités du site.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Annonces en attente</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= stats.pendingAds %></p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Annonces totales</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= stats.totalAds %></p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Utilisateurs</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= stats.totalUsers %></p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Articles de blog</p>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= stats.totalBlogs %></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    <div class="lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Nouveaux utilisateurs par mois</h3>
+                        <div class="mt-4">
+                            <canvas id="usersChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Répartition des annonces</h3>
+                        <div class="mt-4">
+                            <canvas id="adsStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Data from controller
+            const usersData = <%- JSON.stringify(stats.usersByMonth || []) %>;
+            const adsStatusData = <%- JSON.stringify(stats.adsByStatus || []) %>;
+            
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const chartTextColor = isDarkMode ? 'rgba(255, 255, 255, 0.7)' : '#6B7280';
+            const chartGridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+            // Users Chart (Bar)
+            const usersCtx = document.getElementById('usersChart')?.getContext('2d');
+            if (usersCtx) {
+                const userLabels = usersData.map(d => d.month);
+                const userCounts = usersData.map(d => d.count);
+                
+                new Chart(usersCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: userLabels,
+                        datasets: [{
+                            label: 'Nouveaux utilisateurs',
+                            data: userCounts,
+                            backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: chartTextColor, precision: 0 }, grid: { color: chartGridColor } },
+                            x: { ticks: { color: chartTextColor }, grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // Ads Status Chart (Doughnut)
+            const adsCtx = document.getElementById('adsStatusChart')?.getContext('2d');
+            if (adsCtx) {
+                const adsLabels = adsStatusData.map(d => d.status.charAt(0).toUpperCase() + d.status.slice(1));
+                const adsCounts = adsStatusData.map(d => d.count);
+
+                new Chart(adsCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: adsLabels,
+                        datasets: [{
+                            label: 'Statut des annonces',
+                            data: adsCounts,
+                            backgroundColor: ['rgba(252, 211, 77, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(239, 68, 68, 0.7)'],
+                            borderColor: 'transparent',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { color: chartTextColor } } }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

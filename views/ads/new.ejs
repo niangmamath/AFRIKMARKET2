@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-4xl mx-auto py-12">
+    <div class="bg-white py-8 px-6 shadow sm:rounded-lg">
+        <form action="/ads" method="POST" class="space-y-8 divide-y divide-gray-200" enctype="multipart/form-data" novalidate>
+            <div class="space-y-8 divide-y divide-gray-200">
+                <div>
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Créez une nouvelle annonce</h3>
+                        <p class="mt-1 text-sm text-gray-500">Remplissez les informations ci-dessous pour poster votre annonce.</p>
+                    </div>
+                    <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <div class="sm:col-span-6">
+                            <label for="title" class="block text-sm font-medium text-gray-700"> Titre de l'annonce </label>
+                            <div class="mt-1">
+                                <input type="text" name="title" id="title" autocomplete="off"
+                                       value="<%= locals.ad && ad.title ? ad.title : '' %>"
+                                       class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border <%= (locals.errors && errors.find(e => e.param === 'title')) ? 'border-red-500' : 'border-gray-300' %> rounded-md">
+                            </div>
+                             <% if (locals.errors && errors.find(e => e.param === 'title')) { %>
+                                <p class="mt-2 text-sm text-red-600"><%= errors.find(e => e.param === 'title').msg %></p>
+                            <% } %>
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="description" class="block text-sm font-medium text-gray-700"> Description </label>
+                            <div class="mt-1">
+                                <textarea id="description" name="description"
+                                          rows="5"
+                                          class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border <%= (locals.errors && errors.find(e => e.param === 'description')) ? 'border-red-500' : 'border-gray-300' %> rounded-md"><%= locals.ad && ad.description ? ad.description : '' %></textarea>
+                            </div>
+                            <% if (locals.errors && errors.find(e => e.param === 'description')) { %>
+                                <p class="mt-2 text-sm text-red-600"><%= errors.find(e => e.param === 'description').msg %></p>
+                            <% } %>
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="price" class="block text-sm font-medium text-gray-700"> Prix </label>
+                            <div class="mt-1 relative rounded-md shadow-sm">
+                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-sm"> € </span>
+                                </div>
+                                <input type="number" name="price" id="price" step="0.01" 
+                                    value="<%= locals.ad && ad.price ? ad.price : '' %>"
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border <%= (locals.errors && errors.find(e => e.param === 'price')) ? 'border-red-500' : 'border-gray-300' %> rounded-md"
+                                    placeholder="0.00">
+                            </div>
+                             <% if (locals.errors && errors.find(e => e.param === 'price')) { %>
+                                <p class="mt-2 text-sm text-red-600"><%= errors.find(e => e.param === 'price').msg %></p>
+                            <% } %>
+                        </div>
+
+                        <div class="sm:col-span-3">
+                            <label for="category" class="block text-sm font-medium text-gray-700"> Catégorie </label>
+                            <div class="mt-1">
+                                <input type="text" name="category" id="category" value="<%= locals.ad && ad.category ? ad.category : '' %>"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="location" class="block text-sm font-medium text-gray-700"> Lieu </label>
+                            <div class="mt-1">
+                                <input type="text" name="location" id="location" value="<%= locals.ad && ad.location ? ad.location : '' %>"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-6">
+                            <label for="image" class="block text-sm font-medium text-gray-700"> Image </label>
+                            <div class="mt-1">
+                                <input type="file" name="image" id="image"
+                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-5">
+                <div class="flex justify-end">
+                    <a href="/ads" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Annuler</a>
+                    <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Poster l'annonce</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

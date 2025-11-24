@@ -1,0 +1,78 @@
+<div class="max-w-7xl mx-auto">
+
+    <!-- Page Header -->
+    <div class="sm:flex sm:items-center sm:justify-between mb-6">
+        <h1 class="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">Gestion des Utilisateurs</h1>
+        <a href="/admin" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-600">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Retour au tableau de bord
+        </a>
+    </div>
+
+    <!-- Users Table -->
+    <div class="admin-table-container">
+        <div class="responsive-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Rôle</th>
+                        <th>Inscrit le</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (users.length > 0) { %>
+                        <% users.forEach(targetUser => { %>
+                            <tr>
+                                <td>
+                                    <div class="cell-user">
+                                        <div class="user-avatar">
+                                            <%= targetUser.username.charAt(0).toUpperCase() %>
+                                        </div>
+                                        <div class="user-info">
+                                            <div class="username"><%= targetUser.username %></div>
+                                            <div class="email"><%= targetUser.email %></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="role-badge <%= targetUser.role === 'admin' ? 'role-admin' : 'role-user' %>">
+                                        <%= targetUser.role %>
+                                    </span>
+                                </td>
+                                <td class="text-gray-600 dark:text-gray-400">
+                                    <%= new Date(targetUser.createdAt).toLocaleDateString('fr-FR') %>
+                                </td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <% if (locals.user && locals.user.id !== targetUser.id) { %>
+                                            <% if (targetUser.role === 'user') { %>
+                                                <form action="/admin/users/<%= targetUser._id %>/promote?_method=POST" method="POST">
+                                                    <button type="submit" class="action-btn btn-primary">Promouvoir</button>
+                                                </form>
+                                            <% } else { %>
+                                                <form action="/admin/users/<%= targetUser._id %>/demote?_method=POST" method="POST">
+                                                    <button type="submit" class="action-btn btn-danger">Rétrograder</button>
+                                                </form>
+                                            <% } %>
+                                        <% } else { %>
+                                            <span class="text-xs text-gray-400 italic">(C'est vous)</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" class="text-center py-10">
+                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Aucun utilisateur trouvé</h2>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Il n'y a aucun utilisateur à afficher pour le moment.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
