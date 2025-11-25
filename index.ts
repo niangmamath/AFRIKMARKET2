@@ -2,7 +2,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
-import dotenv from 'dotenv';
 import path from 'path';
 import methodOverride from 'method-override';
 import flash from 'connect-flash';
@@ -26,9 +25,6 @@ declare global {
         }
     }
 }
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 
