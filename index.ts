@@ -1,6 +1,5 @@
 
 import express, { Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import dotenv from 'dotenv';
@@ -17,7 +16,7 @@ import adRoutes from './routes/adRoutes';
 import homeRoutes from './routes/homeRoutes';
 import userRoutes from './routes/userRoutes';
 import blogRoutes from './routes/blogRoutes';
-import adminRoutes from './routes/adminRoutes'; // Importer les routes admin
+import adminRoutes from './routes/adminRoutes'; 
 
 // Augmenter le type Request de Express pour inclure l'utilisateur
 declare global {
@@ -32,19 +31,16 @@ declare global {
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
-
-// --- Database Connection ---
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/leboncoin';
-mongoose.connect(mongoUri)
-  .then(() => console.log('MongoDB connected successfully.'))
-  .catch(err => console.error('MongoDB connection error:', err));
 
 // --- Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- View Engine Setup ---
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 // --- Session Management ---
 declare module 'express-session' {
@@ -53,18 +49,25 @@ declare module 'express-session' {
     }
 }
 const sessionSecret = process.env.SESSION_SECRET || 'a-very-strong-secret-key';
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/leboncoin';
+
+// Conditionally create MongoStore only if not in a test environment
+const store = process.env.NODE_ENV === 'test' 
+    ? undefined 
+    : MongoStore.create({ mongoUrl: mongoUri });
+
 app.use(session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: mongoUri }),
+    store: store,
     cookie: { httpOnly: true, secure: process.env.NODE_ENV === "production", maxAge: 1000 * 60 * 60 * 24 }
 }));
 
 // Flash middleware
 app.use(flash());
 
-// Middleware global pour attacher l'utilisateur et les messages flash
+// Middleware global
 app.use(async (req: Request, res: Response, next: NextFunction) => {
     res.locals.isAuthenticated = !!req.session.userId;
     
@@ -89,19 +92,12 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
-// --- View Engine Setup ---
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'ejs');
-
 // --- Routes ---
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/ads', adRoutes);
 app.use(userRoutes);
-app.use(blogRoutes); // Utiliser les routes de blog
-app.use('/admin', adminRoutes); // Utiliser les routes admin
+app.use(blogRoutes);
+app.use('/admin', adminRoutes);
 
-// --- Server Startup ---
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+export default app;
