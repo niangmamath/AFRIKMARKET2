@@ -42,15 +42,8 @@ export const getAd = async (req: Request, res: Response) => {
             return res.redirect('/ads');
         }
 
-        let isAuthor = false;
-        if (req.session.userId && ad.author) {
-            const authorId = (ad.author as any)._id.toString();
-            if (authorId === req.session.userId) {
-                isAuthor = true;
-            }
-        }
-
-        const isAdmin = req.session.user && req.session.user.role === 'admin';
+        const isAuthor = req.user && ad.author && (ad.author as any)._id.toString() === req.user._id.toString();
+        const isAdmin = req.user && req.user.role === 'admin';
 
         res.render('ads/show', {
             title: ad.title,
@@ -80,7 +73,7 @@ export const createAd = async (req: Request, res: Response) => {
     try {
         const { title, description, price, category } = req.body;
         const newAd = new Ad({
-            title, description, price, category, author: req.session.userId
+            title, description, price, category, author: req.user // Use req.user._id if author is just the ID
         });
         if (req.file) {
             newAd.imageUrl = req.file.path;
