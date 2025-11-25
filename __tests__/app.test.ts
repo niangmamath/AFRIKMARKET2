@@ -1,31 +1,26 @@
 import request from 'supertest';
 import app from '../index';
 import mongoose from 'mongoose';
-import http from 'http';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/leboncoin-test';
+let mongod: MongoMemoryServer;
 
-let server: http.Server;
-
-// Connect to DB and start the server before any tests run
-beforeAll((done) => {
-  mongoose.connect(mongoUri).then(() => {
-    server = http.createServer(app);
-    server.listen(done); // Start server and call done() when ready
-  });
+beforeAll(async () => {
+  mongod = await MongoMemoryServer.create();
+  const uri = mongod.getUri();
+  await mongoose.connect(uri);
 });
 
-// Close the server and the database connection after all tests are done
-afterAll((done) => {
-  mongoose.disconnect().then(() => {
-    server.close(done); // Close server and call done() when finished
-  });
+afterAll(async () => {
+  await mongoose.disconnect();
+  if (mongod) {
+    await mongod.stop();
+  }
 });
 
 describe('GET /', () => {
   it('should return 200 OK', async () => {
-    // Use the running server for the test request
-    const res = await request(server).get('/');
+    const res = await request(app).get('/');
     expect(res.statusCode).toEqual(200);
   });
 });
