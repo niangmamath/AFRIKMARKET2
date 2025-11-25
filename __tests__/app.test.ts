@@ -1,25 +1,31 @@
 import request from 'supertest';
 import app from '../index';
 import mongoose from 'mongoose';
+import http from 'http';
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/leboncoin-test';
 
-// Connect to a test database before any tests run
-beforeAll(async () => {
-  await mongoose.connect(mongoUri);
-  // Wait for the connection to be fully established
-  await new Promise(resolve => mongoose.connection.once('open', resolve));
+let server: http.Server;
+
+// Connect to DB and start the server before any tests run
+beforeAll((done) => {
+  mongoose.connect(mongoUri).then(() => {
+    server = http.createServer(app);
+    server.listen(done); // Start server and call done() when ready
+  });
 });
 
-// Close the database connection after all tests are done
-afterAll(async () => {
-  // Use disconnect() to ensure all connections are closed
-  await mongoose.disconnect();
+// Close the server and the database connection after all tests are done
+afterAll((done) => {
+  mongoose.disconnect().then(() => {
+    server.close(done); // Close server and call done() when finished
+  });
 });
 
 describe('GET /', () => {
   it('should return 200 OK', async () => {
-    const res = await request(app).get('/');
+    // Use the running server for the test request
+    const res = await request(server).get('/');
     expect(res.statusCode).toEqual(200);
   });
 });
