@@ -7,7 +7,7 @@
     "test": "jest --runInBand",
     "dev": "nodemon",
     "build": "npm run build:css && tsc && npm run copy-files",
-    "copy-files": "cpy \"views/**\" \"public/**\" dist",
+    "copy-files": "cp -r views dist/ && cp -r public dist/",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css",
     "start": "node dist/server.js"
   },
