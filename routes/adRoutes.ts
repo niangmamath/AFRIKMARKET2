@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import * as adController from '../controllers/adController';
-import upload from '../config/cloudinary';
+import upload from '../config/multer'; // Correctly import multer instance
 import { ensureAuthenticated, checkAdOwnership } from '../middleware/authMiddleware';
 
 const router = express.Router();
