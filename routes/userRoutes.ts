@@ -1,32 +1,29 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { body } from 'express-validator';
-import { getUserProfile, updateUserProfile } from '../controllers/userController';
-// Correctly import the pre-configured multer instance as the default export
-import upload from '../config/cloudinary';
+import * as UserController from '../controllers/userController'; // Correctly import all controller functions
 import { ensureAuthenticated } from '../middleware/authMiddleware';
+import { upload } from '../config/multer';
 
-const router = express.Router();
+const router: Router = express.Router();
 
-// --- User Profile Routes ---
-
-// @route   GET /profile
-// @desc    Show the user's profile page
-// @access  Private
-router.get('/profile', ensureAuthenticated, getUserProfile);
-
-// @route   PUT /profile
-// @desc    Update user profile information
-// @access  Private
+// Route pour mettre à jour le profil utilisateur, incluant l'upload de l'image de profil
 router.put(
     '/profile',
     ensureAuthenticated,
-    // Use the imported upload middleware directly
     upload.single('profileImage'),
     [
-        body('username', 'Le nom d\\\'utilisateur ne peut pas être vide.').not().isEmpty().trim(),
+        body('username', 'Le nom d\'utilisateur ne peut pas être vide.').not().isEmpty().trim(),
         body('email', 'Veuillez fournir un email valide.').isEmail().normalizeEmail()
     ],
-    updateUserProfile
+    UserController.updateUserProfile
+);
+
+// Route pour récupérer les informations de l'utilisateur connecté
+// Note: The route path for getUserProfile was changed from /me to /profile to match common practice
+router.get(
+    '/profile',
+    ensureAuthenticated, 
+    UserController.getUserProfile
 );
 
 export default router;

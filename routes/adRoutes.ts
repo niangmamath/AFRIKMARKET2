@@ -1,51 +1,44 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { body } from 'express-validator';
-import * as adController from '../controllers/adController';
-import upload from '../config/multer'; // Correctly import multer instance
-import { ensureAuthenticated, checkAdOwnership } from '../middleware/authMiddleware';
+import * as AdController from '../controllers/adController'; // Correctly import all controller functions
+import { ensureAuthenticated } from '../middleware/authMiddleware';
+import { upload } from '../config/multer'; 
 
-const router = express.Router();
+const router: Router = express.Router();
 
-// --- Public routes for ads ---
-router.get('/', adController.getAds);
-
-// --- Private routes for authenticated users ---
-// IMPORTANT: Route for 'new' must come BEFORE route for ':id'
-router.get('/new', ensureAuthenticated, adController.getNewAdForm);
-
-// --- Public route for a single ad ---
-// This must be after '/new' to avoid treating 'new' as an ID
-router.get('/:id', adController.getAd);
-
-// --- Actions for authenticated users ---
+// Route pour créer une nouvelle annonce
 router.post(
     '/',
     ensureAuthenticated,
-    upload.single('image'),
+    upload.single('image'), // Champ pour l'image de l'annonce
     [
         body('title', 'Le titre est requis').not().isEmpty(),
         body('price', 'Le prix doit être un nombre positif').isFloat({ gt: 0 }),
         body('description', 'La description est requise').not().isEmpty(),
-        body('category', 'La catégorie est requise').not().isEmpty()
     ],
-    adController.createAd
+    AdController.createAd
 );
 
-// --- Actions for ad owner ---
-router.get('/:id/edit', ensureAuthenticated, checkAdOwnership, adController.getEditAdForm);
+// Route pour récupérer toutes les annonces
+router.get('/', AdController.getAds); // Corrected from getAllAds to getAds
+
+// Route pour récupérer une annonce par son ID
+router.get('/:id', AdController.getAd); // Corrected from getAdById to getAd
+
+// Route pour mettre à jour une annonce
 router.put(
-    '/:id', 
-    ensureAuthenticated, 
-    checkAdOwnership, 
-    upload.single('image'), 
+    '/:id',
+    ensureAuthenticated,
+    upload.single('image'), // Permet de changer l'image lors de la mise à jour
     [
         body('title', 'Le titre est requis').not().isEmpty(),
         body('price', 'Le prix doit être un nombre positif').isFloat({ gt: 0 }),
         body('description', 'La description est requise').not().isEmpty(),
-        body('category', 'La catégorie est requise').not().isEmpty()
     ],
-    adController.updateAd
+    AdController.updateAd
 );
-router.delete('/:id', ensureAuthenticated, checkAdOwnership, adController.deleteAd);
+
+// Route pour supprimer une annonce
+router.delete('/:id', ensureAuthenticated, AdController.deleteAd);
 
 export default router;

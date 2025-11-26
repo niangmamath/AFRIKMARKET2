@@ -1,16 +1,20 @@
-import multer from 'multer';
-import CloudinaryStorage from 'multer-storage-cloudinary';
+import { Request } from 'express';
+import multer, { Multer } from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from './cloudinary';
 
-// The library (v2) is a factory function, not a class. We call it directly.
-const storage = CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  folder: 'afrikmarket',
-  allowedFormats: ['jpg', 'png', 'jpeg'], // Corrected property name for v2
-  // The 'params' object and 'transformation' option are features of v4 and are removed.
+  params: (req: Request, file: Express.Multer.File) => {
+    return {
+      folder: 'afrikmarket',
+      allowed_formats: ['jpg', 'png', 'jpeg'],
+      transformation: [{ width: 500, height: 500, crop: 'limit' }],
+    };
+  },
 });
 
-// Initialize multer with the Cloudinary storage engine
-const upload = multer({ storage: storage });
+const upload: Multer = multer({ storage: storage });
 
-export default upload;
+// Use a named export instead of a default export
+export { upload };
