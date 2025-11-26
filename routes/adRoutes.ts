@@ -2,15 +2,17 @@ import express, { Router } from 'express';
 import { body } from 'express-validator';
 import * as AdController from '../controllers/adController'; // Correctly import all controller functions
 import { ensureAuthenticated } from '../middleware/authMiddleware';
-import { upload } from '../config/multer'; 
+// Import both upload and our new middleware
+import { upload, uploadToCloudinary } from '../config/multer'; 
 
 const router: Router = express.Router();
 
-// Route pour créer une nouvelle annonce
+// Route to create a new ad
 router.post(
     '/',
     ensureAuthenticated,
-    upload.single('image'), // Champ pour l'image de l'annonce
+    upload.single('image'), // 1. Multer handles the file and stores it in memory
+    uploadToCloudinary,     // 2. Our middleware uploads it to Cloudinary
     [
         body('title', 'Le titre est requis').not().isEmpty(),
         body('price', 'Le prix doit être un nombre positif').isFloat({ gt: 0 }),
@@ -19,17 +21,18 @@ router.post(
     AdController.createAd
 );
 
-// Route pour récupérer toutes les annonces
-router.get('/', AdController.getAds); // Corrected from getAllAds to getAds
+// Route to get all ads
+router.get('/', AdController.getAds);
 
-// Route pour récupérer une annonce par son ID
-router.get('/:id', AdController.getAd); // Corrected from getAdById to getAd
+// Route to get a single ad by its ID
+router.get('/:id', AdController.getAd);
 
-// Route pour mettre à jour une annonce
+// Route to update an ad
 router.put(
     '/:id',
     ensureAuthenticated,
-    upload.single('image'), // Permet de changer l'image lors de la mise à jour
+    upload.single('image'), // 1. Multer handles the file
+    uploadToCloudinary,     // 2. Our middleware uploads it
     [
         body('title', 'Le titre est requis').not().isEmpty(),
         body('price', 'Le prix doit être un nombre positif').isFloat({ gt: 0 }),
@@ -38,7 +41,7 @@ router.put(
     AdController.updateAd
 );
 
-// Route pour supprimer une annonce
+// Route to delete an ad
 router.delete('/:id', ensureAuthenticated, AdController.deleteAd);
 
 export default router;

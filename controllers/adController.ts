@@ -1,7 +1,16 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import Ad from '../models/Ad';
+
+// Extend the Express Request type to include our custom property
+declare global {
+  namespace Express {
+    interface Request {
+      cloudinaryResult?: UploadApiResponse;
+    }
+  }
+}
 
 const CATEGORIES = ['Immobilier', 'Véhicules', 'Maison & Jardin', 'Électronique', 'Loisirs', 'Mode', 'Autres'];
 
@@ -11,7 +20,7 @@ export const getAds = async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string) || 1;
         const limit = 8;
         const category = req.query.category as string || '';
-        const query: any = {}; // Pas de filtre par statut
+        const query: any = {};
         if (category) {
             query.category = category;
         }
@@ -73,12 +82,15 @@ export const createAd = async (req: Request, res: Response) => {
     try {
         const { title, description, price, category } = req.body;
         const newAd = new Ad({
-            title, description, price, category, author: req.user // Use req.user._id if author is just the ID
+            title, description, price, category, author: req.user
         });
-        if (req.file) {
-            newAd.imageUrl = req.file.path;
-            newAd.imageFilename = req.file.filename;
+
+        // The uploadToCloudinary middleware has run, and the result is on req.cloudinaryResult
+        if (req.cloudinaryResult) {
+            newAd.imageUrl = req.cloudinaryResult.secure_url;
+            newAd.imageFilename = req.cloudinaryResult.public_id; // public_id is the identifier for deletion
         }
+
         await newAd.save();
         req.flash('success_msg', 'Annonce créée avec succès !');
         res.redirect('/ads');
@@ -116,21 +128,27 @@ export const updateAd = async (req: Request, res: Response) => {
         });
     }
     try {
-        const ad = await Ad.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-
+        const ad = await Ad.findById(req.params.id);
         if (!ad) {
             req.flash('error_msg', 'Annonce non trouvée');
             return res.redirect('/ads');
         }
 
-        if (req.file) {
+        // Update text fields
+        ad.set(req.body);
+
+        // Check if a new file was uploaded and processed by our middleware
+        if (req.cloudinaryResult) {
+            // Delete the old image from Cloudinary if it exists
             if (ad.imageFilename) {
                 await cloudinary.uploader.destroy(ad.imageFilename);
             }
-            ad.imageUrl = req.file.path;
-            ad.imageFilename = req.file.filename;
-            await ad.save();
+            // Save the new image details
+            ad.imageUrl = req.cloudinaryResult.secure_url;
+            ad.imageFilename = req.cloudinaryResult.public_id;
         }
+
+        await ad.save(); // Save all changes (text and/or image)
 
         req.flash('success_msg', 'Annonce mise à jour avec succès !');
         res.redirect(`/ads/${ad._id}`);
@@ -150,6 +168,7 @@ export const deleteAd = async (req: Request, res: Response) => {
             return res.redirect('/ads');
         }
         if (ad.imageFilename) {
+            // This uses the public_id to delete the image from Cloudinary
             await cloudinary.uploader.destroy(ad.imageFilename);
         }
         await Ad.deleteOne({ _id: req.params.id });
