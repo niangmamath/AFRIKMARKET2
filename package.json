@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --runInBand",
     "dev": "nodemon",
-    "build": "npm run build:css && tsc",
+    "build": "npm run build:css && tsc && npm run copy-files",
+    "copy-files": "cpy \"views/**\" \"public/**\" dist",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css",
     "start": "node dist/server.js"
   },
@@ -56,6 +57,7 @@
     "@types/streamifier": "^0.1.2",
     "@types/supertest": "^6.0.3",
     "concurrently": "^8.2.2",
+    "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.2.0",
