@@ -1,11 +1,12 @@
 import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from './cloudinary';
+import { Request } from 'express';
 
 // Define the storage engine for Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: (req, file) => {
+  params: (req: Request, file: Express.Multer.File) => {
     return {
       folder: 'afrikmarket', // The name of the folder in Cloudinary
       allowed_formats: ['jpg', 'png', 'jpeg'], // Allowed image formats
