@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// Les variables d'environnement sont maintenant chargées via la commande de démarrage.
 
 // =================================================================
-// TRÈS TÔT DANS LE DÉMARRAGE. Si vous ne voyez pas ça, l'app ne se lance pas.
 console.log(`[AFRIKMARKET LOG] Exécution de server.ts commencée à ${new Date().toISOString()}`);
 console.log(`[AFRIKMARKET LOG] NODE_ENV: ${process.env.NODE_ENV}`);
 // =================================================================
@@ -36,7 +34,7 @@ if (process.env.NODE_ENV !== 'test') {
     await connectDB();
     
     app.listen(port, () => {
-      console.log(`[AFRIKMARKET LOG] Le serveur écoute sur le port ${port}`);
+      console.log(`[AFRIKMARKET LOG] ✅ Serveur prêt ! Visitez http://localhost:${port}`);
     });
   })().catch(err => {
       console.error('[AFRIKMARKET LOG] Erreur non gérée pendant le démarrage asynchrone du serveur:', err);

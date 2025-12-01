@@ -1,8 +1,7 @@
-
 import { v2 as cloudinary } from 'cloudinary';
-import 'dotenv/config';
 
 // Configure Cloudinary
+// Les variables d'environnement sont chargées au démarrage de l'application.
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 

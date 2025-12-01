@@ -9,7 +9,7 @@
     "build": "npm run build:css && tsc && npm run copy-files",
     "copy-files": "cp -r views dist/ && cp -r public dist/",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css",
-    "start": "node dist/server.js"
+    "start": "node -r dotenv/config dist/server.js"
   },
   "nodemonConfig": {
     "watch": [
@@ -20,7 +20,7 @@
       "node_modules",
       "dist"
     ],
-    "exec": "ts-node server.ts"
+    "exec": "ts-node -r dotenv/config server.ts"
   },
   "keywords": [],
   "author": "",

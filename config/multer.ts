@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import multer, { Multer } from 'multer';
-import { v2 as cloudinary } from 'cloudinary';
 import streamifier from 'streamifier';
+// Import the configured cloudinary instance
+import cloudinary from './cloudinary';
 
 // Configure multer to use memory storage so we can stream the file to Cloudinary
 const storage = multer.memoryStorage();

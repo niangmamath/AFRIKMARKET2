@@ -7,6 +7,9 @@ import { upload, uploadToCloudinary } from '../config/multer';
 
 const router: Router = express.Router();
 
+// Route to display the form for creating a new ad
+router.get('/new', ensureAuthenticated, AdController.getNewAdForm);
+
 // Route to create a new ad
 router.post(
     '/',
@@ -26,6 +29,9 @@ router.get('/', AdController.getAds);
 
 // Route to get a single ad by its ID
 router.get('/:id', AdController.getAd);
+
+// Route to display the form for editing an ad
+router.get('/:id/edit', ensureAuthenticated, AdController.getEditAdForm);
 
 // Route to update an ad
 router.put(
