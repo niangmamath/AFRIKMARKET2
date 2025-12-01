@@ -28,6 +28,9 @@ declare global {
 
 const app = express();
 
+// Faites confiance au premier proxy devant l'application. Essentiel pour le cookie "secure" en production.
+app.set('trust proxy', 1);
+
 // --- Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
