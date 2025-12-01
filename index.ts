@@ -98,7 +98,7 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
 
 // --- Sitemap Route ---
 let sitemap: Buffer | undefined;
-app.get('/sitemap.xml', async (req, res) => {
+app.get('/sitemap.xml', async (req: Request, res: Response) => {
   res.header('Content-Type', 'application/xml');
   res.header('Content-Encoding', 'gzip');
   // if we have a cached sitemap, send it
@@ -119,7 +119,7 @@ app.get('/sitemap.xml', async (req, res) => {
 
     // Add dynamic pages, e.g., from a database
     const ads = await Ad.find();
-    ads.forEach(ad => {
+    ads.forEach((ad: any) => {
       smStream.write({
         url: `/ads/${ad._id}`,
         changefreq: 'weekly',
