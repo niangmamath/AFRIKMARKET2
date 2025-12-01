@@ -135,13 +135,10 @@
     </script>
 </nav>
 
-<div class="py-10">
-    <header>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- The main title is now managed by each page, so we can remove the generic one here -->
-        </div>
-    </header>
-    <main>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="px-4 py-8 sm:px-0">
-                  <%- include('./flash-messages') %>
+<main>
+    <% if (title !== 'Accueil') { %>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="px-4 py-6 sm:px-0">
+    <% } %>
+
+    <%- include('./flash-messages') %>
