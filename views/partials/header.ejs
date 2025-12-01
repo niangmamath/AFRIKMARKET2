@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AfrikMarket | <%= title %></title>
+    <meta name="description" content="<%= locals.description || 'AfrikMarket est une plateforme d\'achat et de vente en ligne pour la communauté africaine.' %>">
+    <meta name="keywords" content="<%= locals.keywords || 'ecommerce, afrique, marché, petites annonces' %>">
+    <meta name="author" content="AfrikMarket">
+    <meta property="og:title" content="<%= title %> | AfrikMarket" />
+    <meta property="og:description" content="<%= locals.description || 'AfrikMarket est une plateforme d\'achat et de vente en ligne pour la communauté africaine.' %>" />
+    <meta property="og:image" content="<%= locals.imageUrl || 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1763922049/LOGO_AFRIKMARKET-removebg-preview_axhsfa.png' %>" />
+    <meta property="og:url" content="<%= 'https://afrikmarket.com' + (locals.currentPath || '/') %>" />
+    <meta property="og:type" content="website" />
     <link rel="icon" href="https://res.cloudinary.com/dlqwxsufy/image/upload/v1763922049/LOGO_AFRIKMARKET-removebg-preview_axhsfa.png" type="image/png">
     <link rel="stylesheet" href="/css/output.css">
 </head>

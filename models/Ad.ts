@@ -12,6 +12,7 @@ export interface IAd extends Document {
     imageFilename?: string;
     author: Types.ObjectId | Record<string, unknown>;
     createdAt: Date;
+    updatedAt: Date;
     status: 'pending' | 'approved' | 'rejected';
 }
 
