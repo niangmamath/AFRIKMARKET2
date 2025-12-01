@@ -131,9 +131,9 @@ app.get('/sitemap.xml', async (req, res) => {
     smStream.end();
 
     // cache the sitemap
-    streamToPromise(pipeline).then(sm => sitemap = sm);
+    streamToPromise(pipeline).then((sm: any) => sitemap = sm);
     // stream the response
-    pipeline.pipe(res).on('error', (e) => {throw e;});
+    pipeline.pipe(res).on('error', (e: any) => {throw e;});
   } catch (e) {
     console.error(e);
     res.status(500).end();
@@ -146,7 +146,7 @@ app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/ads', adRoutes);
 app.use(userRoutes);
-app.use(blogRoutes);
+app.use('/blog', blogRoutes);
 app.use('/admin', adminRoutes);
 
 export default app;

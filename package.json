@@ -41,6 +41,7 @@
     "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "sitemap": "^8.0.2",
     "streamifier": "^0.1.1",
     "supertest": "^7.0.0"
   },
