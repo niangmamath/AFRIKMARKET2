@@ -5,11 +5,11 @@ import Ad from '../models/Ad';
 // @route   GET /
 export const getHomePage = async (req: Request, res: Response) => {
     try {
-        // Fetch the 4 most recent approved ads
+        // CORRECTION : S'assure de ne récupérer QUE les annonces approuvées.
         const recentAds = await Ad.find({ status: 'approved' })
             .sort({ createdAt: -1 })
             .limit(4)
-            .populate('author', 'username') // Optional: if you want to show author info
+            .populate('author', 'username')
             .lean();
 
         res.render('index', {

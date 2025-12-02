@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Ad from '../models/Ad';
 import User from '../models/User';
 import Blog from '../models/Blog';
+import Notification from '../models/Notification'; // Importer le modèle Notification
 
 /**
  * @desc    Affiche la page principale du tableau de bord avec des statistiques et des graphiques
@@ -82,14 +83,22 @@ export const getAds = async (req: Request, res: Response, next: NextFunction) =>
     try {
         const statusFilter = req.query.status;
         const query = statusFilter ? { status: statusFilter } : {};
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
 
-        const ads = await Ad.find(query).populate('author', 'username email').sort({ createdAt: -1 });
+        const totalAds = await Ad.countDocuments(query);
+        const totalPages = Math.ceil(totalAds / limit);
+
+        const ads = await Ad.find(query).populate('author', 'username email').sort({ createdAt: -1 }).skip(skip).limit(limit);
 
         res.render('admin/ads/index', {
             title: 'Gérer les annonces',
             layout: 'layouts/admin',
             ads: ads,
-            currentStatus: statusFilter
+            currentStatus: statusFilter,
+            currentPage: page,
+            totalPages: totalPages
         });
     } catch (error) {
         next(error);
@@ -110,6 +119,17 @@ export const approveAd = async (req: Request, res: Response, next: NextFunction)
         }
         ad.status = 'approved';
         await ad.save();
+
+        // Créer une notification pour l'auteur de l'annonce
+        if (ad.author) {
+            const notification = new Notification({
+                user: ad.author, // ID de l'auteur
+                message: `Votre annonce "${ad.title}" a été approuvée.`,
+                link: `/ads/${ad._id}` // Lien direct vers l'annonce
+            });
+            await notification.save();
+        }
+
         req.flash('success_msg', 'Annonce approuvée avec succès.');
         res.redirect('/admin/ads?status=pending');
     } catch (error) {
@@ -131,6 +151,17 @@ export const rejectAd = async (req: Request, res: Response, next: NextFunction) 
         }
         ad.status = 'rejected';
         await ad.save();
+
+        // Créer une notification de rejet pour l'auteur de l'annonce
+        if (ad.author) {
+            const notification = new Notification({
+                user: ad.author, // ID de l'auteur
+                message: `Votre annonce "${ad.title}" a été rejetée.`
+                // Pas de lien car l'annonce n'est pas accessible
+            });
+            await notification.save();
+        }
+
         req.flash('success_msg', 'Annonce rejetée avec succès.');
         res.redirect('/admin/ads?status=pending');
     } catch (error) {
@@ -147,11 +178,20 @@ export const rejectAd = async (req: Request, res: Response, next: NextFunction) 
  */
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const users = await User.find().sort({ createdAt: -1 });
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const totalUsers = await User.countDocuments();
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        const users = await User.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
         res.render('admin/users/index', {
             title: 'Gérer les utilisateurs',
             layout: 'layouts/admin',
-            users: users
+            users: users,
+            currentPage: page,
+            totalPages: totalPages
         });
     } catch (error) {
         next(error);

@@ -8,6 +8,7 @@ import flash from 'connect-flash';
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { createGzip } from 'zlib';
 import Ad from './models/Ad';
+import helmet from 'helmet'; // Import helmet
 
 // Import models
 import User, { IUser } from './models/User';
@@ -19,8 +20,11 @@ import homeRoutes from './routes/homeRoutes';
 import userRoutes from './routes/userRoutes';
 import blogRoutes from './routes/blogRoutes';
 import adminRoutes from './routes/adminRoutes';
+import notificationRoutes from './routes/notificationRoutes'; // Importer les routes de notification
 
-// Augmenter le type Request de Express pour inclure l'utilisateur
+// Import middleware
+import { loadNotifications } from './middleware/loadNotifications';
+
 declare global {
     namespace Express {
         interface Request {
@@ -31,7 +35,17 @@ declare global {
 
 const app = express();
 
-// Faites confiance au premier proxy devant l'application. Essentiel pour le cookie "secure" en production.
+// --- Security Middleware ---
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "script-src": ["'self'", "'unsafe-inline'"],
+            "img-src": ["'self'", "data:", "res.cloudinary.com", "https:"],
+        },
+    })
+);
+
 app.set('trust proxy', 1);
 
 // --- Middleware ---
@@ -50,26 +64,30 @@ declare module 'express-session' {
         userId?: string;
     }
 }
-const sessionSecret = process.env.SESSION_SECRET || 'a-very-strong-secret-key';
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/leboncoin';
+if (!process.env.SESSION_SECRET) {
+    throw new Error('FATAL: SESSION_SECRET is not defined.');
+}
 
-// Conditionally create MongoStore only if not in a test environment
+const mongoUri = process.env.MONGO_URI;
+if (!mongoUri) {
+    throw new Error('FATAL: MONGO_URI is not defined.');
+}
+
 const store = process.env.NODE_ENV === 'test'
     ? undefined
     : MongoStore.create({ mongoUrl: mongoUri });
 
 app.use(session({
-    secret: sessionSecret,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: store,
     cookie: { httpOnly: true, secure: process.env.NODE_ENV === "production", maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-// Flash middleware
 app.use(flash());
 
-// Middleware global
+// Middleware pour charger l'utilisateur et les messages flash
 app.use(async (req: Request, res: Response, next: NextFunction) => {
     res.locals.isAuthenticated = !!req.session.userId;
     res.locals.currentPath = req.path;
@@ -95,29 +113,28 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
     next();
 });
 
+// Middleware pour charger les notifications de l'utilisateur
+app.use(loadNotifications);
 
-// --- Sitemap Route ---
+
 let sitemap: Buffer | undefined;
 app.get('/sitemap.xml', async (req: Request, res: Response) => {
   res.header('Content-Type', 'application/xml');
   res.header('Content-Encoding', 'gzip');
-  // if we have a cached sitemap, send it
   if (sitemap) {
     return res.send(sitemap);
   }
 
   try {
-    const smStream = new SitemapStream({ hostname: 'https://afrikmarket.com' }); // Change to your domain
+    const smStream = new SitemapStream({ hostname: 'https://afrikmarket.com' });
     const pipeline = smStream.pipe(createGzip());
 
-    // Add any static pages
     smStream.write({ url: '/',  changefreq: 'daily', priority: 1.0 });
     smStream.write({ url: '/ads',  changefreq: 'daily',  priority: 0.8 });
     smStream.write({ url: '/blog', changefreq: 'weekly', priority: 0.7 });
     smStream.write({ url: '/auth/login',  changefreq: 'monthly', priority: 0.4 });
     smStream.write({ url: '/auth/register',  changefreq: 'monthly', priority: 0.4 });
 
-    // Add dynamic pages, e.g., from a database
     const ads = await Ad.find();
     ads.forEach((ad: any) => {
       smStream.write({
@@ -130,9 +147,7 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
     
     smStream.end();
 
-    // cache the sitemap
     streamToPromise(pipeline).then((sm: any) => sitemap = sm);
-    // stream the response
     pipeline.pipe(res).on('error', (e: any) => {throw e;});
   } catch (e) {
     console.error(e);
@@ -148,5 +163,6 @@ app.use('/ads', adRoutes);
 app.use(userRoutes);
 app.use('/blog', blogRoutes);
 app.use('/admin', adminRoutes);
+app.use('/notifications', notificationRoutes); // Ajouter les routes de notification
 
 export default app;

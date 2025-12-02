@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as adminController from '../controllers/adminController';
+import * as blogController from '../controllers/blogController';
 import { ensureAuthenticated, ensureAdmin } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -50,11 +51,31 @@ router.delete('/users/:id', ensureAuthenticated, ensureAdmin, adminController.de
 // @desc    Page de gestion des articles de blog
 // @route   GET /admin/blog
 // @access  Private (Admin)
-router.get('/blog', ensureAuthenticated, ensureAdmin, adminController.getBlogPosts);
+router.get('/blog', ensureAuthenticated, ensureAdmin, blogController.getAdminBlogPage);
 
-// @desc    Supprimer un article de blog
+// @desc    Afficher le formulaire de création d'un nouvel article
+// @route   GET /admin/blog/new
+// @access  Private (Admin)
+router.get('/blog/new', ensureAuthenticated, ensureAdmin, blogController.getNewBlogPostForm);
+
+// @desc    Soumettre le nouvel article
+// @route   POST /admin/blog
+// @access  Private (Admin)
+router.post('/blog', ensureAuthenticated, ensureAdmin, blogController.createBlogPost);
+
+// @desc    Afficher le formulaire de modification d'un article
+// @route   GET /admin/blog/:id/edit
+// @access  Private (Admin)
+router.get('/blog/:id/edit', ensureAuthenticated, ensureAdmin, blogController.getEditBlogPostForm);
+
+// @desc    Mettre à jour un article
+// @route   POST /admin/blog/:id/edit
+// @access  Private (Admin)
+router.post('/blog/:id/edit', ensureAuthenticated, ensureAdmin, blogController.updateBlogPost);
+
+// @desc    Supprimer un article
 // @route   DELETE /admin/blog/:id
 // @access  Private (Admin)
-router.delete('/blog/:id', ensureAuthenticated, ensureAdmin, adminController.deleteBlogPost);
+router.post('/blog/:id/delete', ensureAuthenticated, ensureAdmin, blogController.deleteBlogPost);
 
 export default router;

@@ -1,24 +1,24 @@
-
 import { Schema, model, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-// Interface pour définir la structure du document Utilisateur
+// Interface pour les attributs de l'utilisateur
 export interface IUser extends Document {
     username: string;
     email: string;
-    password: string;
-    role: 'user' | 'admin'; // Définir les rôles possibles
-    profileImageUrl?: string;
-    profileImageFilename?: string;
-    comparePassword(candidatePassword: string): Promise<boolean>;
+    password?: string;
+    role: 'user' | 'admin';
+    createdAt: Date;
+    profileImageUrl?: string;       // Restauré
+    profileImageFilename?: string;  // Restauré
+    comparePassword(password: string): Promise<boolean>;
 }
 
-const UserSchema = new Schema<IUser>({
+const userSchema = new Schema<IUser>({
     username: {
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
     },
     email: {
         type: String,
@@ -26,47 +26,57 @@ const UserSchema = new Schema<IUser>({
         unique: true,
         trim: true,
         lowercase: true,
-        match: [/.+\@.+\..+/, 'Veuillez utiliser une adresse e-mail valide.']
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        minlength: 6,
     },
     role: {
         type: String,
-        enum: ['user', 'admin'], // Le rôle ne peut être que 'user' ou 'admin'
-        default: 'user' // Par défaut, un nouvel utilisateur est un 'user'
+        enum: ['user', 'admin'],
+        default: 'user',
     },
-    profileImageUrl: {
-        type: String,
-        default: ''
+    createdAt: {
+        type: Date,
+        default: Date.now,
     },
-    profileImageFilename: {
+    profileImageUrl: { // Restauré
         type: String,
-        default: ''
-    }
-}, { timestamps: true });
+        required: false,
+    },
+    profileImageFilename: { // Restauré
+        type: String,
+        required: false,
+    },
+});
 
-// --- Hooks ---
-// Hacher le mot de passe avant de sauvegarder l'utilisateur
-UserSchema.pre<IUser>('save', async function(next) {
-    if (!this.isModified('password')) {
+// Middleware pour hasher le mot de passe avant de sauvegarder
+userSchema.pre<IUser>('save', async function (next) {
+    if (!this.isModified('password') || !this.password) {
         return next();
     }
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
         next();
-    } catch (err: any) {
-        next(err);
+    } catch (error) {
+        if (error instanceof Error) {
+            next(error);
+        } else {
+            next(new Error('Une erreur inconnue est survenue lors du hachage du mot de passe'));
+        }
     }
 });
 
-// --- Méthodes ---
-// Méthode pour comparer le mot de passe candidat avec le mot de passe haché
-UserSchema.methods.comparePassword = function(candidatePassword: string): Promise<boolean> {
+// Méthode pour comparer les mots de passe
+userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+    if (!this.password) {
+        return false;
+    }
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = model<IUser>('User', UserSchema);
+const User = model<IUser>('User', userSchema);
+
 export default User;

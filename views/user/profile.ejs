@@ -1,122 +1,127 @@
 <%- include('../partials/header') %>
 
-<div class="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-    <div class="md:grid md:grid-cols-3 md:gap-6">
-        <!-- Colonne de mise à jour du profil -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Colonne du profil -->
         <div class="md:col-span-1">
-            <div class="px-4 sm:px-0">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">Profil</h3>
-                <p class="mt-1 text-sm text-gray-600">
-                    Mettez à jour les informations de votre profil et votre adresse e-mail.
-                </p>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <img class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-200" src="<%= user.profileImageUrl ? user.profileImageUrl : 'https://via.placeholder.com/150' %>" alt="Photo de profil de <%= user.username %>">
+                <h2 class="text-2xl font-bold mt-4"><%= user.username %></h2>
+                <p class="text-gray-600"><%= user.email %></p>
+                <p class="text-sm text-gray-500 mt-2">Membre depuis <%= new Date(user.createdAt).toLocaleDateString('fr-FR') %></p>
+            </div>
+
+            <!-- Formulaire de mise à jour du profil -->
+            <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+                <h3 class="text-xl font-semibold mb-4">Mettre à jour le profil</h3>
+                <form action="/profile?_method=PUT" method="POST" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
+                        <input type="text" name="username" id="username" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" value="<%= user.username %>">
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+                        <input type="email" name="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" value="<%= user.email %>">
+                    </div>
+                    <div class="mb-4">
+                        <label for="profileImage" class="block text-sm font-medium text-gray-700">Changer la photo de profil</label>
+                        <input type="file" name="profileImage" id="profileImage" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Enregistrer les modifications</button>
+                </form>
             </div>
         </div>
-        <div class="mt-5 md:mt-0 md:col-span-2">
-            <form action="/profile?_method=PUT" method="POST" enctype="multipart/form-data">
-                <div class="shadow sm:rounded-md sm:overflow-hidden">
-                    <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
-                        <!-- Champ Nom d'utilisateur -->
-                        <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700">Nom d'utilisateur</label>
-                            <input type="text" name="username" id="username" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="<%= user.username %>">
-                        </div>
 
-                        <!-- Champ Email -->
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-                            <input type="email" name="email" id="email" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="<%= user.email %>">
-                        </div>
+        <!-- Colonne des annonces -->
+        <div class="md:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4">Mes Annonces</h3>
 
-                        <!-- Champ Photo de profil -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Photo de profil</label>
-                            <div class="mt-1 flex items-center">
-                                <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
-                                    <img id="profile-image-preview" src="<%= user.profileImageUrl ? user.profileImageUrl : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>" alt="Photo de profil" class="h-full w-full object-cover">
-                                </span>
-                                <input type="file" name="profileImage" id="profileImage" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <!-- Barre d'onglets -->
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs" id="ad-tabs">
+                        <button data-tab="approved" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">Approuvées (<%= approvedAds.length %>)</button>
+                        <button data-tab="pending" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">En attente (<%= pendingAds.length %>)</button>
+                        <button data-tab="rejected" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Rejetées (<%= rejectedAds.length %>)</button>
+                    </nav>
+                </div>
+
+                <!-- Panneaux de contenu des onglets -->
+                <div class="mt-6">
+                    <!-- Annonces Approuvées -->
+                    <div id="tab-panel-approved" class="tab-panel">
+                        <% if (approvedAds.length > 0) { %>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <% approvedAds.forEach(ad => { %>
+                                    <%- include('../partials/ad-card', { ad: ad, showStatus: false }) %>
+                                <% }); %>
                             </div>
-                        </div>
-                    </div>
-                    <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Enregistrer
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Séparateur -->
-    <div class="hidden sm:block" aria-hidden="true">
-        <div class="py-5">
-            <div class="border-t border-gray-200"></div>
-        </div>
-    </div>
-
-    <!-- Section Mes Annonces -->
-    <div class="mt-10 sm:mt-0">
-        <div class="md:grid md:grid-cols-3 md:gap-6">
-            <div class="md:col-span-1">
-                <div class="px-4 sm:px-0">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900">Mes Annonces</h3>
-                    <p class="mt-1 text-sm text-gray-600">
-                        Gérez les annonces que vous avez publiées.
-                    </p>
-                </div>
-            </div>
-            <div class="mt-5 md:mt-0 md:col-span-2">
-                <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                    <ul class="divide-y divide-gray-200">
-                        <% if(ads.length > 0) { %>
-                            <% ads.forEach(ad => { %>
-                                <li>
-                                    <a href="/ads/<%= ad._id %>" class="block hover:bg-gray-50">
-                                        <div class="flex items-center px-4 py-4 sm:px-6">
-                                            <div class="min-w-0 flex-1 flex items-center">
-                                                <div class="flex-shrink-0">
-                                                    <img class="h-12 w-12 rounded-md" src="<%= ad.imageUrl ? ad.imageUrl : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>" alt="">
-                                                </div>
-                                                <div class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
-                                                    <div>
-                                                        <p class="text-sm font-medium text-indigo-600 truncate"><%= ad.title %></p>
-                                                        <p class="mt-2 flex items-center text-sm text-gray-500">
-                                                            <span class="truncate"><%= ad.category %></span>
-                                                        </p>
-                                                    </div>
-                                                    <div class="hidden md:block">
-                                                        <div>
-                                                            <p class="text-sm text-gray-900">
-                                                                Prix: <%= ad.price %> €
-                                                            </p>
-                                                            <p class="mt-2 text-sm text-gray-500">
-                                                                Publiée le <%= new Date(ad.createdAt).toLocaleDateString() %>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <!-- Chevron -->
-                                                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            <% }) %>
                         <% } else { %>
-                            <li class="px-4 py-4 sm:px-6">
-                                Vous n'avez encore posté aucune annonce.
-                            </li>
+                            <p class="text-gray-500">Vous n'avez aucune annonce approuvée pour le moment.</p>
                         <% } %>
-                    </ul>
+                    </div>
+
+                    <!-- Annonces En Attente -->
+                    <div id="tab-panel-pending" class="tab-panel hidden">
+                         <% if (pendingAds.length > 0) { %>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <% pendingAds.forEach(ad => { %>
+                                    <%- include('../partials/ad-card', { ad: ad, showStatus: true, statusText: 'En attente' }) %>
+                                <% }); %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-gray-500">Vous n'avez aucune annonce en attente de validation.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Annonces Rejetées -->
+                    <div id="tab-panel-rejected" class="tab-panel hidden">
+                         <% if (rejectedAds.length > 0) { %>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <% rejectedAds.forEach(ad => { %>
+                                    <%- include('../partials/ad-card', { ad: ad, showStatus: true, statusText: 'Rejetée', statusClass: 'bg-red-100 text-red-800' }) %>
+                                <% }); %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-gray-500">Vous n'avez aucune annonce rejetée.</p>
+                        <% } %>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    const tabsContainer = document.getElementById('ad-tabs');
+    const tabButtons = tabsContainer.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Désactiver tous les boutons
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-indigo-500', 'text-indigo-600');
+                btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            });
+            // Activer le bouton cliqué
+            button.classList.add('border-indigo-500', 'text-indigo-600');
+            button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+
+            const tab = button.getAttribute('data-tab');
+
+            // Cacher tous les panneaux
+            tabPanels.forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            // Afficher le panneau correspondant
+            const targetPanel = document.getElementById(`tab-panel-${tab}`);
+            if (targetPanel) {
+                targetPanel.classList.remove('hidden');
+            }
+        });
+    });
+</script>
 
 <%- include('../partials/footer') %>

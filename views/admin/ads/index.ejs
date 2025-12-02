@@ -1,99 +1,128 @@
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- Page Header -->
-    <div class="sm:flex sm:items-center sm:justify-between mb-6">
-        <h1 class="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">Gérer les Annonces</h1>
-        <a href="/admin" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-600">
-            <i class="fas fa-arrow-left mr-2"></i>
+    <div class="sm:flex sm:items-center sm:justify-between my-6">
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Gérer les Annonces</h1>
+        <a href="/admin" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             Retour au tableau de bord
         </a>
     </div>
 
     <!-- Status Filter Tabs -->
     <div class="mb-6">
-        <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                  <a href="/admin/ads" 
-                   class="<%= !currentStatus ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' %> 
-                          whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Toutes</a>
+                   class="<%= !currentStatus ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> 
+                          whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Toutes</a>
                 <a href="/admin/ads?status=pending" 
-                   class="<%= currentStatus === 'pending' ? 'border-yellow-500 text-yellow-600 dark:text-yellow-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' %> 
-                          whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">En attente</a>
+                   class="<%= currentStatus === 'pending' ? 'border-yellow-500 text-yellow-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> 
+                          whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">En attente</a>
                 <a href="/admin/ads?status=approved" 
-                   class="<%= currentStatus === 'approved' ? 'border-green-500 text-green-600 dark:text-green-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' %> 
-                          whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Approuvées</a>
+                   class="<%= currentStatus === 'approved' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> 
+                          whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Approuvées</a>
                 <a href="/admin/ads?status=rejected" 
-                   class="<%= currentStatus === 'rejected' ? 'border-red-500 text-red-600 dark:text-red-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' %> 
-                          whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">Rejetées</a>
+                   class="<%= currentStatus === 'rejected' ? 'border-red-500 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> 
+                          whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Rejetées</a>
             </nav>
         </div>
     </div>
 
     <!-- Ads Table -->
-     <div class="admin-table-container">
-        <div class="responsive-table-wrapper">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Annonce</th>
-                        <th>Prix</th>
-                        <th>Auteur</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (ads.length > 0) { %>
-                        <% ads.forEach(ad => { %>
+    <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <td>
-                                    <div class="cell-user">
-                                        <% if (ad.images && ad.images.length > 0) { %>
-                                            <img src="<%= ad.images[0] %>" alt="<%= ad.title %>" class="ad-image">
-                                        <% } else { %>
-                                            <div class="ad-image bg-gray-200 dark:bg-gray-700"></div>
-                                        <% } %>
-                                        <div class="user-info">
-                                            <a href="/ads/<%= ad._id %>" target="_blank" class="username hover:underline"><%= ad.title %></a>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="font-semibold text-gray-800 dark:text-gray-200">
-                                    <%= ad.price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) %>
-                                </td>
-                                <td class="text-gray-600 dark:text-gray-400">
-                                     <%= ad.author ? ad.author.username : 'N/A' %>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-<%= ad.status %>">
-                                        <%= ad.status %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="actions-cell">
-                                        <% if (ad.status === 'pending') { %>
-                                            <form action="/admin/ads/<%= ad._id %>/approve?_method=POST" method="POST">
-                                                <button type="submit" class="action-btn btn-success">Approuver</button>
-                                            </form>
-                                            <form action="/admin/ads/<%= ad._id %>/reject?_method=POST" method="POST">
-                                                <button type="submit" class="action-btn btn-danger">Rejeter</button>
-                                            </form>
-                                        <% } %>
-                                        <a href="/ads/<%= ad._id %>" target="_blank" class="action-btn btn-secondary">Voir</a>
-                                    </div>
-                                </td>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Annonce</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auteur</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
-                        <% }); %>
-                    <% } else { %>
-                        <tr>
-                           <td colspan="5" class="text-center py-10">
-                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Aucune annonce trouvée</h2>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Il n'y a aucune annonce correspondant à ce filtre.</p>
-                            </td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% if (ads.length > 0) { %>
+                                <% ads.forEach(ad => { %>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden bg-gray-100">
+                                                    <img class="h-full w-full object-cover" src="<%= ad.imageUrl || 'https://via.placeholder.com/150' %>" alt="Image de l'annonce : <%= ad.title %>">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900"><%= ad.title %></div>
+                                                    <div class="text-sm text-gray-500"><%= ad.category %></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <%= ad.price ? ad.price.toLocaleString('fr-FR') + ' FCFA' : 'N/A' %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= ad.author ? ad.author.username : 'N/A' %></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <% if (ad.status === 'approved') { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Approuvée</span>
+                                            <% } else if (ad.status === 'pending') { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En attente</span>
+                                            <% } else { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Rejetée</span>
+                                            <% } %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex items-center justify-end space-x-3">
+                                                <% if (ad.status === 'pending') { %>
+                                                    <form action="/admin/ads/<%= ad._id %>/approve?_method=POST" method="POST" class="inline-block">
+                                                        <button type="submit" class="text-green-600 hover:text-green-900">Approuver</button>
+                                                    </form>
+                                                    <form action="/admin/ads/<%= ad._id %>/reject?_method=POST" method="POST" class="inline-block">
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">Rejeter</button>
+                                                    </form>
+                                                <% } %>
+                                                <a href="/ads/<%= ad._id %>" target="_blank" class="text-indigo-600 hover:text-indigo-900">Voir</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                   <td colspan="5" class="text-center py-12">
+                                        <div class="mx-auto">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2z" />
+                                            </svg>
+                                            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune annonce</h3>
+                                            <p class="mt-1 text-sm text-gray-500">Il n'y a aucune annonce correspondant à ce filtre.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+        <nav class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4" aria-label="Pagination">
+            <div class="hidden sm:block">
+                <p class="text-sm text-gray-700">
+                    Page <span class="font-medium"><%= currentPage %></span> sur <span class="font-medium"><%= totalPages %></span>
+                </p>
+            </div>
+            <div class="flex-1 flex justify-between sm:justify-end">
+                 <% if (currentPage > 1) { %>
+                    <a href="/admin/ads?page=<%= currentPage - 1 %>&status=<%= currentStatus || '' %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Précédent</a>
+                <% } %>
+                <% if (currentPage < totalPages) { %>
+                    <a href="/admin/ads?page=<%= currentPage + 1 %>&status=<%= currentStatus || '' %>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Suivant</a>
+                <% } %>
+            </div>
+        </nav>
+    <% } %>
+
 </div>

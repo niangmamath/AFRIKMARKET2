@@ -7,14 +7,14 @@ const router = express.Router();
 // Route pour la page d'accueil
 router.get('/', async (req, res) => {
     try {
-        // Récupérer les 10 dernières annonces
-        const latestAds: IAd[] = await Ad.find()
+        // CORRECTION : Récupérer les 10 dernières annonces APPROUVÉES
+        const latestAds: IAd[] = await Ad.find({ status: 'approved' })
             .sort({ createdAt: -1 })
             .limit(10)
             .populate('author');
 
         res.render('index', { 
-            recentAds: latestAds, // CORRECTION : Passer la variable sous le nom 'recentAds'
+            recentAds: latestAds,
             title: 'Accueil'
         });
     } catch (error) {

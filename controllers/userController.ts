@@ -4,8 +4,10 @@ import { v2 as cloudinary } from 'cloudinary';
 import User, { IUser } from '../models/User';
 import Ad from '../models/Ad';
 
-// @desc    Display user profile page with their ads
-// @route   GET /profile
+/**
+ * @desc    Affiche la page de profil de l'utilisateur avec ses annonces triées par statut.
+ * @route   GET /profile
+ */
 export const getUserProfile = async (req: Request, res: Response) => {
     try {
         const user = await User.findById(req.session.userId);
@@ -14,12 +16,20 @@ export const getUserProfile = async (req: Request, res: Response) => {
             return res.redirect('/');
         }
 
+        // Récupérer toutes les annonces de l'utilisateur
         const userAds = await Ad.find({ author: req.session.userId }).sort({ createdAt: -1 }).lean();
+
+        // Séparer les annonces par statut
+        const approvedAds = userAds.filter(ad => ad.status === 'approved');
+        const pendingAds = userAds.filter(ad => ad.status === 'pending');
+        const rejectedAds = userAds.filter(ad => ad.status === 'rejected');
 
         res.render('user/profile', {
             title: 'Mon Profil',
             user: user,
-            ads: userAds,
+            approvedAds, // Annonces approuvées
+            pendingAds,  // Annonces en attente
+            rejectedAds, // Annonces rejetées
             errors: []
         });
     } catch (err: any) {
@@ -29,18 +39,27 @@ export const getUserProfile = async (req: Request, res: Response) => {
     }
 };
 
-// @desc    Update user profile information
-// @route   PUT /profile
+/**
+ * @desc    Met à jour les informations du profil utilisateur.
+ * @route   PUT /profile
+ */
 export const updateUserProfile = async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        // If validation fails, re-render the form with errors
+        // En cas d'erreur de validation, recharger la page avec les données nécessaires
         const user = await User.findById(req.session.userId);
         const userAds = await Ad.find({ author: req.session.userId }).sort({ createdAt: -1 }).lean();
+
+        const approvedAds = userAds.filter(ad => ad.status === 'approved');
+        const pendingAds = userAds.filter(ad => ad.status === 'pending');
+        const rejectedAds = userAds.filter(ad => ad.status === 'rejected');
+
         return res.status(400).render('user/profile', {
             title: 'Mon Profil',
             user: user,
-            ads: userAds,
+            approvedAds,
+            pendingAds,
+            rejectedAds,
             errors: errors.array(),
         });
     }
@@ -54,13 +73,13 @@ export const updateUserProfile = async (req: Request, res: Response) => {
             return res.redirect('/');
         }
 
-        // Update username and email
+        // Mettre à jour le nom d'utilisateur et l'e-mail
         user.username = username;
         user.email = email;
 
-        // Handle profile image upload
+        // Gérer le téléchargement de l'image de profil
         if (req.file) {
-            // If there's an old image, delete it from Cloudinary
+            // S'il y a une ancienne image, la supprimer de Cloudinary
             if (user.profileImageFilename) {
                 await cloudinary.uploader.destroy(user.profileImageFilename);
             }
@@ -75,7 +94,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 
     } catch (err: any) {
         console.error(err);
-        // Handle potential unique field errors (e.g., email already exists)
+        // Gérer les erreurs de champs uniques (ex: e-mail déjà existant)
         if (err.code === 11000) {
             req.flash('error_msg', 'Cet email ou nom d\'utilisateur est déjà pris.');
         } else {

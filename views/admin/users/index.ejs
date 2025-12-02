@@ -1,78 +1,110 @@
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- Page Header -->
-    <div class="sm:flex sm:items-center sm:justify-between mb-6">
-        <h1 class="text-2xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">Gestion des Utilisateurs</h1>
-        <a href="/admin" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-600">
-            <i class="fas fa-arrow-left mr-2"></i>
+    <div class="sm:flex sm:items-center sm:justify-between my-6">
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Gestion des Utilisateurs</h1>
+        <a href="/admin" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             Retour au tableau de bord
         </a>
     </div>
 
     <!-- Users Table -->
-    <div class="admin-table-container">
-        <div class="responsive-table-wrapper">
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Utilisateur</th>
-                        <th>Rôle</th>
-                        <th>Inscrit le</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (users.length > 0) { %>
-                        <% users.forEach(targetUser => { %>
+    <div class="flex flex-col">
+        <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <td>
-                                    <div class="cell-user">
-                                        <div class="user-avatar">
-                                            <%= targetUser.username.charAt(0).toUpperCase() %>
-                                        </div>
-                                        <div class="user-info">
-                                            <div class="username"><%= targetUser.username %></div>
-                                            <div class="email"><%= targetUser.email %></div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="role-badge <%= targetUser.role === 'admin' ? 'role-admin' : 'role-user' %>">
-                                        <%= targetUser.role %>
-                                    </span>
-                                </td>
-                                <td class="text-gray-600 dark:text-gray-400">
-                                    <%= new Date(targetUser.createdAt).toLocaleDateString('fr-FR') %>
-                                </td>
-                                <td>
-                                    <div class="actions-cell">
-                                        <% if (locals.user && locals.user.id !== targetUser.id) { %>
-                                            <% if (targetUser.role === 'user') { %>
-                                                <form action="/admin/users/<%= targetUser._id %>/promote?_method=POST" method="POST">
-                                                    <button type="submit" class="action-btn btn-primary">Promouvoir</button>
-                                                </form>
-                                            <% } else { %>
-                                                <form action="/admin/users/<%= targetUser._id %>/demote?_method=POST" method="POST">
-                                                    <button type="submit" class="action-btn btn-danger">Rétrograder</button>
-                                                </form>
-                                            <% } %>
-                                        <% } else { %>
-                                            <span class="text-xs text-gray-400 italic">(C'est vous)</span>
-                                        <% } %>
-                                    </div>
-                                </td>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utilisateur</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inscrit le</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
-                        <% }); %>
-                    <% } else { %>
-                        <tr>
-                            <td colspan="4" class="text-center py-10">
-                                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Aucun utilisateur trouvé</h2>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Il n'y a aucun utilisateur à afficher pour le moment.</p>
-                            </td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% if (users.length > 0) { %>
+                                <% users.forEach(targetUser => { %>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                     <div class="h-10 w-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">
+                                                        <%= targetUser.username.charAt(0).toUpperCase() %>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900"><%= targetUser.username %></div>
+                                                    <div class="text-sm text-gray-500"><%= targetUser.email %></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <% if (targetUser.role === 'admin') { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Admin</span>
+                                            <% } else { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Utilisateur</span>
+                                            <% } %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <%= new Date(targetUser.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <% if (locals.user && locals.user.id !== targetUser.id) { %>
+                                                <div class="flex items-center justify-end space-x-4">
+                                                    <% if (targetUser.role === 'user') { %>
+                                                        <form action="/admin/users/<%= targetUser._id %>/promote?_method=POST" method="POST">
+                                                            <button type="submit" class="text-indigo-600 hover:text-indigo-900">Promouvoir Admin</button>
+                                                        </form>
+                                                    <% } else { %>
+                                                        <form action="/admin/users/<%= targetUser._id %>/demote?_method=POST" method="POST">
+                                                            <button type="submit" class="text-red-600 hover:text-red-900">Rétrograder</button>
+                                                        </form>
+                                                    <% } %>
+                                                </div>
+                                            <% } else { %>
+                                                <span class="text-xs text-gray-500 italic">(C'est vous)</span>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                   <td colspan="4" class="text-center py-12">
+                                        <div class="mx-auto">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 11a4 4 0 11-8 0 4 4 0 018 0z" />
+                                            </svg>
+                                            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun utilisateur</h3>
+                                            <p class="mt-1 text-sm text-gray-500">Aucun utilisateur n'est actuellement enregistré.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+
+     <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+        <nav class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4" aria-label="Pagination">
+            <div class="hidden sm:block">
+                <p class="text-sm text-gray-700">
+                    Page <span class="font-medium"><%= currentPage %></span> sur <span class="font-medium"><%= totalPages %></span>
+                </p>
+            </div>
+            <div class="flex-1 flex justify-between sm:justify-end">
+                 <% if (currentPage > 1) { %>
+                    <a href="/admin/users?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Précédent</a>
+                <% } %>
+                <% if (currentPage < totalPages) { %>
+                    <a href="/admin/users?page=<%= currentPage + 1 %>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Suivant</a>
+                <% } %>
+            </div>
+        </nav>
+    <% } %>
+
 </div>
