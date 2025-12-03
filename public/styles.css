@@ -13,8 +13,7 @@ body {
 }
 
 nav {
-    background: #333;
-    color: #fff;
+    /* Le fond est maintenant géré par les classes Tailwind dans le header */
     padding: 10px 0;
     text-align: center;
 }

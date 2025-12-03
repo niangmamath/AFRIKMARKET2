@@ -40,7 +40,7 @@ app.use(
     helmet.contentSecurityPolicy({
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "script-src": ["'self'", "'unsafe-inline'"],
+            "script-src": ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "'unsafe-eval'"], // Autoriser Alpine.js
             "img-src": ["'self'", "data:", "res.cloudinary.com", "https:"],
         },
     })
