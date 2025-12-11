@@ -36,9 +36,18 @@ export const postRegister = async (req: Request, res: Response) => {
                 oldInput: { username: req.body.username, email: req.body.email }
             });
         }
+        
+        // Générer un avatar par défaut unique basé sur le nom d'utilisateur
+        const avatarSeed = encodeURIComponent(username);
+        const defaultAvatarUrl = `https://api.dicebear.com/8.x/adventurer/svg?seed=${avatarSeed}`;
 
-        const newUser = new User({ username, email, password });
-        // La logique spécifique à l'admin a été retirée. Le rôle sera 'user' par défaut.
+        const newUser = new User({
+            username,
+            email,
+            password,
+            profileImageUrl: defaultAvatarUrl, // Assigner l'avatar par défaut
+        });
+
         await newUser.save();
 
         req.flash('success_msg', 'Vous êtes maintenant inscrit et pouvez vous connecter.');

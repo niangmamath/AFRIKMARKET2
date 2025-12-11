@@ -160,7 +160,7 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/ads', adRoutes);
-app.use(userRoutes);
+app.use('/user', userRoutes); // Correction: Préciser le préfixe /user
 app.use('/blog', blogRoutes);
 app.use('/admin', adminRoutes);
 app.use('/notifications', notificationRoutes); // Ajouter les routes de notification

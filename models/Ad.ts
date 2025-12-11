@@ -14,6 +14,8 @@ export interface IAd extends Document {
     createdAt: Date;
     updatedAt: Date;
     status: 'pending' | 'approved' | 'rejected';
+    location: string;
+    phoneNumber: string;
 }
 
 const AdSchema = new Schema<IAd>({
@@ -29,7 +31,9 @@ const AdSchema = new Schema<IAd>({
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending',
         required: true
-    }
+    },
+    location: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
 }, { timestamps: true });
 
 // Appliquer le plugin de pagination au schéma

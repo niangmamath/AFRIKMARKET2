@@ -1,18 +1,16 @@
 
 import { body } from 'express-validator';
 
-const CATEGORIES = ['Immobilier', 'Véhicules', 'Maison & Jardin', 'Électronique', 'Loisirs', 'Mode', 'Autres'];
+const CATEGORIES = ['Immobilier', 'Véhicules', 'Maison & Jardin', 'Électronique', 'Loisirs', 'Mode', 'Autres', 'Vêtements & Mode'];
 
 export const adValidationRules = [
   body('title')
     .notEmpty().withMessage('Le titre est requis.')
-    .trim()
-    .escape(),
+    .trim(),
 
   body('description')
     .notEmpty().withMessage('La description est requise.')
-    .trim()
-    .escape(),
+    .trim(),
 
   body('price')
     .notEmpty().withMessage('Le prix est requis.')
