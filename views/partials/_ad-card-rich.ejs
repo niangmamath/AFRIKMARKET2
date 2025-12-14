@@ -1,0 +1,22 @@
+<a href="/ads/<%= ad._id %>" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out overflow-hidden">
+    <div class="h-48 bg-gray-200 flex items-center justify-center">
+        <% if (ad.imageUrls && ad.imageUrls.length > 0) { %>
+            <img src="<%= ad.imageUrls[0] %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
+        <% } else { %>
+             <img src="https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png" alt="Image par défaut" class="h-full w-full object-cover">
+        <% } %>
+    </div>
+    <div class="p-6">
+        <h2 class="text-xl font-semibold text-gray-800 truncate" title="<%- ad.title %>"><%- ad.title %></h2>
+        <p class="text-2xl font-bold text-indigo-600 my-2"><%= ad.price.toLocaleString('fr-FR') %> MAD</p>
+        <% if (ad.location) { %>
+            <p class="text-sm text-gray-600 flex items-center mt-3">
+                <svg class="h-4 w-4 mr-1.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                <%= ad.location %>
+            </p>
+        <% } %>
+        <div class="border-t border-gray-200 mt-4 pt-4">
+            <p class="text-xs text-gray-500">Posté par <span class="font-medium text-gray-600"><%= ad.author ? ad.author.username : 'Utilisateur inconnu' %></span></p>
+        </div>
+    </div>
+</a>
