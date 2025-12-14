@@ -1,33 +1,32 @@
+
 import express, { Router } from 'express';
 import * as UserController from '../controllers/userController';
 import { ensureAuthenticated } from '../middleware/authMiddleware';
-import { upload } from '../config/multer';
+// Importe l'instance de base de multer pour une configuration flexible
+import { multerUpload } from '../config/multer'; 
 import { profileUpdateValidationRules } from '../validators/userValidator';
-
-// Debugging log to confirm file is loaded
-console.log('--- Initializing user routes ---');
 
 const router: Router = express.Router();
 
-// Route to get the connected user's own profile
-// IMPORTANT: This must come before the /:id route
+// Route pour obtenir le profil de l'utilisateur connecté
 router.get(
     '/profile',
     ensureAuthenticated, 
     UserController.getUserProfile
 );
 
-// Route to get a public user profile
+// Route pour obtenir un profil utilisateur public
 router.get(
     '/:id',
     UserController.getPublicUserProfile
 );
 
-// Route to update user profile
+// Route pour mettre à jour le profil utilisateur
 router.put(
     '/profile',
     ensureAuthenticated,
-    upload.single('profileImage'),
+    // Utilise l'instance de base et spécifie le nom du champ attendu
+    multerUpload.single('profileImage'), 
     profileUpdateValidationRules,
     UserController.updateUserProfile
 );

@@ -5,6 +5,8 @@ Allow: /
 # Disallow crawling of admin and auth-related pages
 Disallow: /admin
 Disallow: /auth
-Disallow: /profile
+Disallow: /user/
 Disallow: /ads/new
 Disallow: /ads/*/edit
+
+Sitemap: https://Afrikmarket.shop/sitemap.xml

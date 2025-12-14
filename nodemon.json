@@ -1,0 +1,5 @@
+{
+  "watch": ["**/*.ts", "**/*.js", "**/*.json", "**/*.ejs"],
+  "ignore": ["node_modules"],
+  "exec": "ts-node -r dotenv/config server.ts"
+}

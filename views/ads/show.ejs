@@ -6,16 +6,21 @@
       <div class="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
         
         <!-- Image gallery -->
-        <div class="flex flex-col items-center">
-          <div class="w-full max-w-lg bg-gray-100 rounded-lg overflow-hidden shadow-lg">
-            <% if (ad.imageUrl) { %>
-              <img src="<%= ad.imageUrl %>" alt="<%- ad.title %>" class="w-full h-full object-center object-cover">
-            <% } else { %>
-              <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                <svg class="h-48 w-48 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-              </div>
-            <% } %>
-          </div>
+        <div class="flex flex-col-reverse items-center">
+            <!-- Main image -->
+            <div class="w-full max-w-lg bg-gray-100 rounded-lg overflow-hidden shadow-lg mt-4">
+                <img id="main-image" src="<%= ad.imageUrls[0] || 'https://via.placeholder.com/800x800.png?text=Pas+d\'image' %>" alt="<%- ad.title %>" class="w-full h-96 object-center object-cover">
+            </div>
+            <!-- Thumbnail grid -->
+            <div class="w-full max-w-lg mx-auto sm:block">
+                <div class="grid grid-cols-6 gap-2">
+                    <% ad.imageUrls.forEach((url, index) => { %>
+                        <div class="aspect-w-1 aspect-h-1 rounded-lg bg-gray-100 overflow-hidden cursor-pointer hover:opacity-75 thumbnail-container <%= index === 0 ? 'ring-2 ring-indigo-500' : '' %>" data-image-src="<%= url %>">
+                            <img src="<%= url %>" alt="Vignette <%= index + 1 %>" class="w-full h-full object-center object-cover">
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
         </div>
 
         <!-- Product info -->
@@ -66,26 +71,59 @@
             </div>
           </div>
 
-          <!-- Call To Action -->
-          <div class="mt-10">
-             <% if (ad.phoneNumber && !isAuthor) { %>
-                <a href="tel:<%= ad.phoneNumber %>" class="w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.758a10.024 10.024 0 006.46 6.46l.758-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
-                    Appeler le vendeur
+          <!-- Section Call To Action (Logique conditionnelle) -->
+          <% if (ad.affiliateLink) { %>
+            <!-- CAS 1: Annonce d'affiliation -->
+            <div class="mt-10 text-center">
+              <a href="<%= ad.affiliateLink %>" target="_blank" rel="noopener noreferrer" class="w-full bg-green-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                Acheter sur Amazon
+              </a>
+              <p class="mt-2 text-xs text-gray-500">
+                En tant que Partenaire Amazon, je réalise un bénéfice sur les achats remplissant les conditions requises.
+              </p>
+            </div>
+          <% } else { %>
+            <!-- CAS 2: Annonce normale -->
+            <div class="mt-10">
+              <% if (!locals.user) { %>
+                <a href="/auth/login?returnTo=<%= locals.originalUrl %>" class="w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  Connectez-vous pour voir le numéro
                 </a>
-             <% } else if (!isAuthor) { %>
-                <!-- Fallback si pas de numéro, on pourrait imaginer un formulaire de contact ici -->
-                <button type="button" class="w-full bg-gray-400 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white cursor-not-allowed">
-                    Contacter le vendeur (indisponible)
-                </button>
-            <% } %>
-          </div>
+              <% } else if (locals.user && !isAuthor) { %>
+                <% if (ad.phoneNumber) { %>
+                  <a href="tel:<%= ad.phoneNumber %>" class="w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.758a10.024 10.024 0 006.46 6.46l.758-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                      Appeler le vendeur
+                  </a>
+                <% } else { %>
+                  <button type="button" class="w-full bg-gray-400 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white cursor-not-allowed">
+                      Contacter le vendeur (indisponible)
+                  </button>
+                <% } %>
+              <% } %>
+            </div>
+          <% } %>
+
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Pas de script nécessaire pour l'appel -->
+<script>
+    const mainImage = document.getElementById('main-image');
+    const thumbnails = document.querySelectorAll('.thumbnail-container');
+
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            // Changer la source de l'image principale
+            mainImage.src = thumbnail.dataset.imageSrc;
+
+            // Mettre à jour la bordure de sélection
+            thumbnails.forEach(t => t.classList.remove('ring-2', 'ring-indigo-500'));
+            thumbnail.classList.add('ring-2', 'ring-indigo-500');
+        });
+    });
+</script>
 
 <%- include('../partials/footer') %>

@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import Ad from '../models/Ad';
 import User from '../models/User';
 import Blog from '../models/Blog';
-import Notification from '../models/Notification'; // Importer le modèle Notification
+import Testimonial from '../models/Testimonial';
+import Notification from '../models/Notification';
 
 /**
  * @desc    Affiche la page principale du tableau de bord avec des statistiques et des graphiques
@@ -120,12 +121,11 @@ export const approveAd = async (req: Request, res: Response, next: NextFunction)
         ad.status = 'approved';
         await ad.save();
 
-        // Créer une notification pour l'auteur de l'annonce
         if (ad.author) {
             const notification = new Notification({
-                user: ad.author, // ID de l'auteur
+                user: ad.author,
                 message: `Votre annonce "${ad.title}" a été approuvée.`,
-                link: `/ads/${ad._id}` // Lien direct vers l'annonce
+                link: `/ads/${ad._id}`
             });
             await notification.save();
         }
@@ -152,12 +152,10 @@ export const rejectAd = async (req: Request, res: Response, next: NextFunction) 
         ad.status = 'rejected';
         await ad.save();
 
-        // Créer une notification de rejet pour l'auteur de l'annonce
         if (ad.author) {
             const notification = new Notification({
-                user: ad.author, // ID de l'auteur
+                user: ad.author, 
                 message: `Votre annonce "${ad.title}" a été rejetée.`
-                // Pas de lien car l'annonce n'est pas accessible
             });
             await notification.save();
         }
@@ -258,20 +256,21 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     }
 };
 
-// --- Gestion du Blog ---
+
+// --- Gestion des Témoignages ---
 
 /**
- * @desc    Affiche la page de gestion des articles de blog
- * @route   GET /admin/blog
+ * @desc    Affiche la page de gestion des témoignages
+ * @route   GET /admin/testimonials
  * @access  Private (Admin)
  */
-export const getBlogPosts = async (req: Request, res: Response, next: NextFunction) => {
+export const getTestimonialsPage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const blogs = await Blog.find().populate('author', 'username').sort({ createdAt: -1 });
-        res.render('admin/blog/index', {
-            title: 'Gérer le blog',
+        const testimonials = await Testimonial.find().sort({ createdAt: -1 });
+        res.render('admin/testimonials/index', {
+            title: 'Gérer les témoignages',
             layout: 'layouts/admin',
-            blogs: blogs
+            testimonials: testimonials
         });
     } catch (error) {
         next(error);
@@ -279,15 +278,36 @@ export const getBlogPosts = async (req: Request, res: Response, next: NextFuncti
 };
 
 /**
- * @desc    Supprimer un article de blog
- * @route   DELETE /admin/blog/:id
+ * @desc    Crée un nouveau témoignage
+ * @route   POST /admin/testimonials
  * @access  Private (Admin)
  */
-export const deleteBlogPost = async (req: Request, res: Response, next: NextFunction) => {
+export const createTestimonial = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await Blog.findByIdAndDelete(req.params.id);
-        req.flash('success_msg', 'Article de blog supprimé avec succès.');
-        res.redirect('/admin/blog');
+        const { name, message, rating } = req.body;
+        const newTestimonial = new Testimonial({
+            name,
+            message,
+            rating
+        });
+        await newTestimonial.save();
+        req.flash('success_msg', 'Témoignage ajouté avec succès.');
+        res.redirect('/admin/testimonials');
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Supprime un témoignage
+ * @route   DELETE /admin/testimonials/:id
+ * @access  Private (Admin)
+ */
+export const deleteTestimonial = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await Testimonial.findByIdAndDelete(req.params.id);
+        req.flash('success_msg', 'Témoignage supprimé avec succès.');
+        res.redirect('/admin/testimonials');
     } catch (error) {
         next(error);
     }

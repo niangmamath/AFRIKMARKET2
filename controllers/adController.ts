@@ -2,213 +2,189 @@
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import streamifier from 'streamifier';
 import Ad from '../models/Ad';
 
-// Extend the Express Request type to include our custom property
-declare global {
-  namespace Express {
-      interface Request {
-            cloudinaryResult?: UploadApiResponse;
-                }
-                  }
-                  }
-                  
-                  const CATEGORIES = ['Immobilier', 'Véhicules', 'Maison & Jardin', 'Électronique', 'Loisirs', 'Mode', 'Autres'];
-                  
-                  // @desc    Affiche toutes les annonces avec pagination et filtres
-                  export const getAds = async (req: Request, res: Response) => {
-                      try {
-                              const page = parseInt(req.query.page as string) || 1;
-                                      const limit = 8;
-                                              const category = req.query.category as string || '';
-                                                      const query: any = { status: 'approved' }; // CORRECTION: Affiche seulement les annonces approuvées
-                                                              if (category) {
-                                                                          query.category = category;
-                                                                                  }
-                                                                                  
-                                                                                          const result = await Ad.paginate(query, { page, limit, sort: { createdAt: -1 }, populate: 'author' });
-                                                                                          
-                                                                                                  res.render('ads/index', {
-                                                                                                              title: 'Toutes les annonces',
-                                                                                                                          description: "Parcourez des milliers de petites annonces au Sénégal. Trouvez des voitures, des maisons, des emplois et plus encore sur AfrikMarket.",
-                                                                                                                                      keywords: "petites annonces, Sénégal, immobilier, voitures, emploi, AfrikMarket",
-                                                                                                                                                  ads: result.docs,
-                                                                                                                                                              current: result.page,
-                                                                                                                                                                          totalPages: result.totalPages,
-                                                                                                                                                                                      category: category,
-                                                                                                                                                                                                  categories: CATEGORIES
-                                                                                                                                                                                                          });
-                                                                                                                                                                                                              } catch (err: any) {
-                                                                                                                                                                                                                      console.error(err.message);
-                                                                                                                                                                                                                              req.flash('error_msg', 'Erreur lors de la récupération des annonces.');
-                                                                                                                                                                                                                                      res.redirect('/');
-                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                          };
-                                                                                                                                                                                                                                          
-                                                                                                                                                                                                                                          // @desc    Affiche une seule annonce
-                                                                                                                                                                                                                                          export const getAd = async (req: Request, res: Response) => {
-                                                                                                                                                                                                                                              try {
-                                                                                                                                                                                                                                                      const ad = await Ad.findById(req.params.id).populate('author');
-                                                                                                                                                                                                                                                              if (!ad) {
-                                                                                                                                                                                                                                                                          req.flash('error_msg', 'Annonce non trouvée.');
-                                                                                                                                                                                                                                                                                      return res.redirect('/ads');
-                                                                                                                                                                                                                                                                                              }
-                                                                                                                                                                                                                                                                                              
-                                                                                                                                                                                                                                                                                                      const isAuthor = req.user && ad.author && (ad.author as any)._id.toString() === req.user._id.toString();
-                                                                                                                                                                                                                                                                                                              const isAdmin = req.user && req.user.role === 'admin';
-                                                                                                                                                                                                                                                                                                              
-                                                                                                                                                                                                                                                                                                                      // Prepare meta description (truncate for best SEO practice)
-                                                                                                                                                                                                                                                                                                                              const metaDescription = ad.description.length > 155 ? ad.description.substring(0, 152) + '...' : ad.description;
-                                                                                                                                                                                                                                                                                                                              
-                                                                                                                                                                                                                                                                                                                                      res.render('ads/show', {
-                                                                                                                                                                                                                                                                                                                                                  title: ad.title,
-                                                                                                                                                                                                                                                                                                                                                              ad,
-                                                                                                                                                                                                                                                                                                                                                                          isAuthor,
-                                                                                                                                                                                                                                                                                                                                                                                      isAdmin,
-                                                                                                                                                                                                                                                                                                                                                                                                  // SEO Meta Tags
-                                                                                                                                                                                                                                                                                                                                                                                                              description: metaDescription.replace(/\r\n|\n|\r/gm, ' '), // Remove line breaks for meta tag
-                                                                                                                                                                                                                                                                                                                                                                                                                          imageUrl: ad.imageUrl,
-                                                                                                                                                                                                                                                                                                                                                                                                                                      keywords: `${ad.title}, ${ad.category}, AfrikMarket`
-                                                                                                                                                                                                                                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  } catch (err: any) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          console.error(err.message);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  res.redirect('/ads');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // @desc    Affiche le formulaire pour créer une nouvelle annonce
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      export const getNewAdForm = (req: Request, res: Response) => {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          res.render('ads/new', {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   title: 'Créer une annonce', 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            categories: CATEGORIES, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     errors: [], 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              oldInput: {}, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       description: "Publiez gratuitement votre annonce sur AfrikMarket et touchez des milliers d\'acheteurs potentiels au Sénégal.", 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                keywords: "vendre, annonce gratuite, Sénégal, AfrikMarket" 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // @desc    Gère la création d'une nouvelle annonce
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    export const createAd = async (req: Request, res: Response) => {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const errors = validationResult(req);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            if (!errors.isEmpty()) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    return res.status(400).render('ads/new', {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                title: 'Créer une annonce', categories: CATEGORIES, errors: errors.array(), oldInput: req.body
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                try {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const { title, description, price, category, location, phoneNumber } = req.body;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                const newAd = new Ad({
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            title, description, price, category, location, phoneNumber, author: req.user
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // The uploadToCloudinary middleware has run, and the result is on req.cloudinaryResult
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    if (req.cloudinaryResult) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                newAd.imageUrl = req.cloudinaryResult.secure_url;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            newAd.imageFilename = req.cloudinaryResult.public_id; // public_id is the identifier for deletion
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            await newAd.save();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    req.flash('success_msg', 'Annonce créée avec succès ! Votre annonce est en attente d\'approbation par un administrateur.');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            res.redirect('/ads');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } catch (err: any) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        console.error(err.message);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                req.flash('error_msg', 'Erreur lors de la création de l\'annonce.');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        res.redirect('/ads/new');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // @desc    Affiche le formulaire pour éditer une annonce
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            export const getEditAdForm = async (req: Request, res: Response) => {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                try {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const ad = await Ad.findById(req.params.id);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                if (!ad) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            req.flash('error_msg', 'Annonce non trouvée.');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        return res.redirect('/ads');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        res.render('ads/edit', { 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    title: 'Modifier l\'annonce', 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ad, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            categories: CATEGORIES, 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        errors: [], 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   oldInput: ad,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                description: `Modifiez votre annonce: ${ad.title}`,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            keywords: `modifier, édition, ${ad.category}, ${ad.title}`
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } catch (err: any) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                console.error(err.message);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        res.redirect('/ads');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            };
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-// @desc    Gère la mise à jour d'une annonce
-export const updateAd = async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        const adData = { ...req.body, _id: req.params.id };
-        return res.status(400).render('ads/edit', {
-            title: 'Modifier l\'annonce', ad: adData, categories: CATEGORIES, errors: errors.array(), oldInput: req.body
-        });
-    }
+const CATEGORIES = ['Immobilier', 'Véhicules', 'Maison & Jardin', 'Électronique', 'Loisirs', 'Mode', 'Autres'];
 
-    try {
-        const ad = await Ad.findById(req.params.id);
-        if (!ad) {
-            req.flash('error_msg', 'Annonce non trouvée');
-            return res.redirect('/ads');
-        }
-
-        // Mettre à jour les champs de l'annonce
-        ad.title = req.body.title;
-        ad.description = req.body.description;
-        ad.price = req.body.price;
-        ad.category = req.body.category;
-        ad.location = req.body.location;
-        ad.phoneNumber = req.body.phoneNumber;
-        ad.status = 'pending'; // Repasse le statut à "en attente"
-
-        // Vérifier si un nouveau fichier a été téléchargé
-        if (req.cloudinaryResult) {
-            // Supprimer l'ancienne image si elle existe
-            if (ad.imageFilename) {
-                await cloudinary.uploader.destroy(ad.imageFilename);
+// Fonction helper pour l'upload vers Cloudinary
+const uploadToCloudinary = (file: Express.Multer.File): Promise<UploadApiResponse> => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: 'afrikmarket', transformation: [{ width: 800, height: 800, crop: 'limit' }] },
+            (error, result) => {
+                if (error) return reject(error);
+                if (!result) return reject(new Error('Cloudinary upload failed.'));
+                resolve(result);
             }
-            // Enregistrer les détails de la nouvelle image
-            ad.imageUrl = req.cloudinaryResult.secure_url;
-            ad.imageFilename = req.cloudinaryResult.public_id;
-        }
+        );
+        streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+};
 
-        await ad.save();
-
-        req.flash('success_msg', 'Annonce mise à jour. Elle est maintenant en attente d\'approbation.');
-        res.redirect('/user/profile'); // Rediriger vers le profil
-
+// Affiche toutes les annonces
+export const getAds = async (req: Request, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 8;
+        const result = await Ad.paginate({ status: 'approved' }, {
+            page, limit, sort: { createdAt: -1 }, populate: 'author'
+        });
+        res.render('ads/index', {
+            title: 'Toutes les annonces', ads: result.docs, current: result.page, totalPages: result.totalPages
+        });
     } catch (err: any) {
-        console.error(err.message);
-        req.flash('error_msg', 'Erreur lors de la mise à jour.');
-        res.redirect(`/ads/${req.params.id}/edit`);
+        console.error(err);
+        res.redirect('/');
     }
 };
 
+// Affiche une seule annonce
+export const getAd = async (req: Request, res: Response) => {
+    try {
+        const ad = await Ad.findById(req.params.id).populate('author');
+        if (!ad) {
+            req.flash('error_msg', 'Annonce non trouvée.');
+            return res.redirect('/ads');
+        }
+        const isAuthor = req.user && ad.author && (ad.author as any)._id.toString() === req.user._id.toString();
+        res.render('ads/show', { title: ad.title, ad, isAuthor, originalUrl: req.originalUrl });
+    } catch (err: any) {
+        console.error(err);
+        res.redirect('/ads');
+    }
+};
 
-// @desc    Supprime une annonce
-export const deleteAd = async (req: Request, res: Response) => {
+// Affiche le formulaire de création
+export const getNewAdForm = (req: Request, res: Response) => {
+    res.render('ads/new', { title: 'Créer une annonce', categories: CATEGORIES, errors: [], oldInput: {} });
+};
+
+// Crée une annonce (Sécurisé avec images multiples)
+export const createAd = async (req: Request, res: Response) => {
+    if (!req.user) {
+        req.flash('error_msg', 'Vous devez être connecté pour créer une annonce.');
+        return res.redirect('/auth/login');
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).render('ads/new', { title: 'Créer une annonce', categories: CATEGORIES, errors: errors.array(), oldInput: req.body });
+    }
+
+    const files = req.files as Express.Multer.File[];
+    if (!files || files.length === 0) {
+        req.flash('error_msg', 'Vous devez télécharger au moins une image.');
+        return res.status(400).render('ads/new', { title: 'Créer une annonce', categories: CATEGORIES, errors: [{ msg: 'Vous devez télécharger au moins une image.' }], oldInput: req.body });
+    }
+
+    try {
+        const { title, description, price, category, location, phoneNumber, affiliateLink } = req.body;
+
+        const newAdData: any = {
+            title,
+            description,
+            price,
+            category,
+            location,
+            phoneNumber,
+            author: req.user,
+            imageUrls: [] // Initialiser le tableau d'URLs
+        };
+
+        // Seul un admin peut ajouter un lien d'affiliation
+        if (req.user.role === 'admin' && affiliateLink) {
+            newAdData.affiliateLink = affiliateLink;
+        }
+        
+        // Téléverser les images en parallèle
+        const uploadPromises = files.map(file => uploadToCloudinary(file));
+        const uploadResults = await Promise.all(uploadPromises);
+        newAdData.imageUrls = uploadResults.map(result => result.secure_url);
+
+        const newAd = new Ad(newAdData);
+        await newAd.save();
+        
+        req.flash('success_msg', 'Annonce créée avec succès ! Elle est en attente d\'approbation.');
+        res.redirect('/ads');
+    } catch (err: any) {
+        console.error(err);
+        req.flash('error_msg', 'Erreur lors de la création de l\'annonce.');
+        res.redirect('back');
+    }
+};
+
+// Affiche le formulaire d'édition
+export const getEditAdForm = async (req: Request, res: Response) => {
     try {
         const ad = await Ad.findById(req.params.id);
         if (!ad) {
             req.flash('error_msg', 'Annonce non trouvée.');
             return res.redirect('/ads');
         }
-        if (ad.imageFilename) {
-            // This uses the public_id to delete the image from Cloudinary
-            await cloudinary.uploader.destroy(ad.imageFilename);
+        res.render('ads/edit', { title: 'Modifier l\'annonce', ad, categories: CATEGORIES, errors: [] });
+    } catch (err: any) {
+        console.error(err);
+        res.redirect('/ads');
+    }
+};
+
+// Met à jour une annonce (Sécurisé avec images multiples)
+export const updateAd = async (req: Request, res: Response) => {
+    if (!req.user) {
+        req.flash('error_msg', 'Action non autorisée.');
+        return res.redirect('/');
+    }
+    try {
+        const ad = await Ad.findById(req.params.id);
+        if (!ad) {
+            req.flash('error_msg', 'Annonce non trouvée.');
+            return res.redirect('/ads');
         }
+
+        const { title, description, price, category, location, phoneNumber, affiliateLink } = req.body;
+        ad.title = title;
+        ad.description = description;
+        ad.price = price;
+        ad.category = category;
+        ad.location = location;
+        ad.phoneNumber = phoneNumber;
+
+        if (req.user.role === 'admin') {
+            ad.affiliateLink = affiliateLink || undefined;
+        } else if (ad.affiliateLink) {
+           // Empêche un non-admin de modifier/supprimer un lien existant
+        }
+
+        ad.status = 'pending';
+
+        const files = req.files as Express.Multer.File[];
+        // Si de nouvelles images sont téléchargées, les traiter
+        if (files && files.length > 0) {
+            const uploadPromises = files.map(file => uploadToCloudinary(file));
+            const uploadResults = await Promise.all(uploadPromises);
+            // Remplacer les anciennes images par les nouvelles
+            ad.imageUrls = uploadResults.map(result => result.secure_url);
+        }
+
+        await ad.save();
+        req.flash('success_msg', 'Annonce mise à jour et en attente d\'approbation.');
+        res.redirect(`/ads/${ad._id}`);
+    } catch (err: any) {
+        console.error(err);
+        req.flash('error_msg', 'Erreur lors de la mise à jour.');
+        res.redirect(`/ads/${req.params.id}/edit`);
+    }
+};
+
+// Supprime une annonce
+export const deleteAd = async (req: Request, res: Response) => {
+    try {
         await Ad.deleteOne({ _id: req.params.id });
         req.flash('success_msg', 'Annonce supprimée avec succès.');
         res.redirect('/ads');
     } catch (err: any) {
-        console.error(err.message);
-        req.flash('error_msg', 'Erreur lors de la suppression.');
+        console.error(err);
         res.redirect('/ads');
     }
 };

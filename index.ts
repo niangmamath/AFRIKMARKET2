@@ -1,4 +1,8 @@
 
+// Import et configuration EXPLICITE de Cloudinary au tout début.
+import { configureCloudinary } from './config/cloudinary';
+configureCloudinary();
+
 import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
@@ -42,6 +46,7 @@ app.use(
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
             "script-src": ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "'unsafe-eval'"], // Autoriser Alpine.js
             "img-src": ["'self'", "data:", "res.cloudinary.com", "https:"],
+            "connect-src": ["'self'", "cdn.jsdelivr.net"], // Autoriser les connexions pour les source maps
         },
     })
 );

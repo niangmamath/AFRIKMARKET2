@@ -9,70 +9,84 @@
                     <p class="mt-3 text-lg text-gray-500">Mettez à jour les informations de votre produit.</p>
                 </div>
 
-                <% if (locals.errors && errors.length > 0) { %>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative my-4" role="alert">
-                        <strong class="font-bold">Erreur !</strong>
-                        <ul>
-                            <% errors.forEach(function(error) { %>
-                                <li><%= error.msg %></li>
-                            <% }); %>
-                        </ul>
+                <% if (errors && errors.length > 0) { %>
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mt-8 rounded-md">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Il y avait des erreurs avec votre soumission :</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul role="list" class="list-disc pl-5 space-y-1">
+                                        <% errors.forEach(function(error) { %>
+                                            <li><%= error.msg %></li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 <% } %>
 
                 <form action="/ads/<%= ad._id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="mt-10 space-y-8">
                     
-                    <!-- Section 1: Détails de l'annonce -->
+                    <!-- Détails de l'annonce -->
                     <div class="space-y-6">
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700">Titre de l'annonce</label>
-                            <input type="text" name="title" id="title" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="<%= ad.title %>" required>
+                            <label for="title" class="block text-sm font-medium text-gray-700">Titre</label>
+                            <input type="text" name="title" id="title" class="block w-full rounded-md border-gray-300" value="<%= ad.title %>" required>
                         </div>
                         <div>
                             <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                            <textarea id="description" name="description" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required><%= ad.description %></textarea>
+                            <textarea id="description" name="description" rows="4" class="block w-full rounded-md border-gray-300" required><%= ad.description %></textarea>
                         </div>
                     </div>
 
-                    <!-- Section 2: Image -->
+                    <!-- Images actuelles -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Photo du produit</label>
-                        <!-- Zone d'aperçu de l'image -->
-                        <div id="image-preview-container" class="<%= ad.imageUrl ? '' : 'hidden' %> mt-2 w-full max-w-sm mx-auto bg-gray-100 rounded-lg shadow-inner overflow-hidden">
-                            <img id="image-preview" src="<%= ad.imageUrl ? ad.imageUrl : '#' %>" alt="Aperçu de l'image" class="w-full h-auto object-cover"/>
-                        </div>
-                        <!-- Interface d'upload -->
-                        <div id="upload-ui" class="<%= ad.imageUrl ? 'hidden' : '' %> mt-2 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Images actuelles</label>
+                        <% if (ad.imageUrls && ad.imageUrls.length > 0) { %>
+                            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                                <% ad.imageUrls.forEach(url => { %>
+                                    <div class="relative aspect-square overflow-hidden rounded-lg shadow-md">
+                                        <img src="<%= url %>" alt="Image actuelle" class="w-full h-full object-cover">
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } else { %>
+                            <p class="text-sm text-gray-500">Cette annonce n'a pas encore d'images.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Remplacement des images -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Remplacer les images</label>
+                        <p class="text-xs text-gray-500 mb-2">Attention : Si vous téléversez de nouvelles images, elles remplaceront <span class="font-bold">toutes</span> les images actuelles.</p>
+                        <div class="mt-2 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
                             <div class="space-y-1 text-center">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                                <div class="flex text-sm text-gray-600">
-                                    <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
-                                        <span>Téléchargez une image</span>
-                                        <input id="file-upload" name="image" type="file" class="sr-only" accept="image/png, image/jpeg, image/gif">
-                                    </label>
-                                    <p class="pl-1">ou glissez-déposez</p>
-                                </div>
+                                <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">
+                                    <span>Téléverser des fichiers</span>
+                                    <!-- IMPORTANT: `multiple` et name="images" -->
+                                    <input id="file-upload" name="images" type="file" class="sr-only" accept="image/png, image/jpeg, image/gif" multiple>
+                                </label>
                                 <p class="text-xs text-gray-500">PNG, JPG, GIF jusqu'à 10MB</p>
                             </div>
                         </div>
-                        <!-- Bouton pour changer l'image -->
-                        <div id="change-image-container" class="<%= ad.imageUrl ? '' : 'hidden' %> text-center mt-2">
-                            <button type="button" id="change-image-btn" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Changer l'image</button>
-                        </div>
                     </div>
 
-                    <!-- Section 3: Détails supplémentaires -->
+                    <!-- Détails supplémentaires -->
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                         <div>
                             <label for="price" class="block text-sm font-medium text-gray-700">Prix (MAD)</label>
-                            <div class="relative mt-1 rounded-md shadow-sm">
-                                <input type="number" name="price" id="price" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="<%= ad.price %>" required>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><span class="text-gray-500 sm:text-sm">MAD</span></div>
-                            </div>
+                            <input type="number" name="price" id="price" class="block w-full rounded-md border-gray-300" value="<%= ad.price %>" required>
                         </div>
                         <div>
                             <label for="category" class="block text-sm font-medium text-gray-700">Catégorie</label>
-                            <select id="category" name="category" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                            <select id="category" name="category" class="mt-1 block w-full rounded-md border-gray-300">
                                 <% categories.forEach(function(category) { %>
                                     <option value="<%= category %>" <%= ad.category === category ? 'selected' : '' %>><%= category %></option>
                                 <% }); %>
@@ -80,19 +94,28 @@
                         </div>
                          <div>
                             <label for="location" class="block text-sm font-medium text-gray-700">Lieu</label>
-                            <input type="text" name="location" id="location" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="<%= ad.location %>" required>
+                            <input type="text" name="location" id="location" class="block w-full rounded-md border-gray-300" value="<%= ad.location %>" required>
                         </div>
                         <div>
                             <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
-                            <input type="tel" name="phoneNumber" id="phoneNumber" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="<%= ad.phoneNumber %>" required>
+                            <input type="tel" name="phoneNumber" id="phoneNumber" class="block w-full rounded-md border-gray-300" value="<%= ad.phoneNumber %>" required>
                         </div>
                     </div>
 
-                    <!-- Form Actions -->
+                    <!-- Champ pour le lien d'affiliation (Admin seulement) -->
+                    <% if (locals.user && locals.user.role === 'admin') { %>
+                        <div class="mt-6">
+                            <label for="affiliateLink" class="block text-sm font-medium text-gray-700">Lien d'affiliation (Optionnel)</label>
+                            <p class="text-xs text-gray-500 mb-2">Ce champ est réservé aux administrateurs.</p>
+                            <input type="url" name="affiliateLink" id="affiliateLink" value="<%= ad.affiliateLink || '' %>" placeholder="https://www.amazon.com/dp/CODE_PRODUIT?tag=votre-tag-20" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    <% } %>
+
+                    <!-- Actions -->
                     <div class="pt-5">
                         <div class="flex justify-end gap-x-3">
-                            <a href="/ads/<%= ad._id %>" class="rounded-md bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Annuler</a>
-                            <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Mettre à jour l'annonce</button>
+                            <a href="/ads/<%= ad._id %>" class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">Annuler</a>
+                            <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white">Mettre à jour l'annonce</button>
                         </div>
                     </div>
                 </form>
@@ -100,34 +123,5 @@
         </div>
     </div>
 </div>
-
-<script>
-    const fileUpload = document.getElementById('file-upload');
-    const imagePreviewContainer = document.getElementById('image-preview-container');
-    const imagePreview = document.getElementById('image-preview');
-    const uploadUi = document.getElementById('upload-ui');
-    const changeImageContainer = document.getElementById('change-image-container');
-    const changeImageBtn = document.getElementById('change-image-btn');
-
-    fileUpload.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreviewContainer.classList.remove('hidden');
-                uploadUi.classList.add('hidden');
-                changeImageContainer.classList.remove('hidden');
-            }
-            
-            reader.readAsDataURL(file);
-        }
-    });
-
-    changeImageBtn.addEventListener('click', function() {
-        fileUpload.click(); // Ouvre la boîte de dialogue de fichier
-    });
-</script>
 
 <%- include('../partials/footer') %>

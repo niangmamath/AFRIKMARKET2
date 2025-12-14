@@ -1,26 +1,24 @@
-
 import express from 'express';
-import Ad, { IAd } from '../models/Ad'; // Assurez-vous que le chemin d'importation est correct
+import { getHomePage } from '../controllers/homeController';
 
 const router = express.Router();
 
-// Route pour la page d'accueil
-router.get('/', async (req, res) => {
-    try {
-        // CORRECTION : Récupérer les 10 dernières annonces APPROUVÉES
-        const latestAds: IAd[] = await Ad.find({ status: 'approved' })
-            .sort({ createdAt: -1 })
-            .limit(10)
-            .populate('author');
+// @desc    Affiche la page d'accueil
+// @route   GET /
+// CORRECTION : Simplification pour utiliser directement le contrôleur importé,
+// qui contient maintenant la logique pour récupérer les annonces et les témoignages.
+router.get('/', getHomePage);
 
-        res.render('index', { 
-            recentAds: latestAds,
-            title: 'Accueil'
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Erreur serveur');
-    }
+// @desc    Affiche la page de politique de confidentialité
+// @route   GET /privacy
+router.get('/privacy', (req, res) => {
+    res.render('pages/privacy', { title: 'Politique de confidentialité' });
+});
+
+// @desc    Affiche la page des conditions d'utilisation
+// @route   GET /terms
+router.get('/terms', (req, res) => {
+    res.render('pages/terms', { title: "Conditions d\'utilisation" });
 });
 
 export default router;

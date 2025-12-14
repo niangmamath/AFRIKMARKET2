@@ -65,7 +65,8 @@ export const getLogin = (req: Request, res: Response) => {
     res.render('auth/login', {
         title: 'Connexion',
         errors: [],
-        oldInput: { email: '' } 
+        oldInput: { email: '' },
+        returnTo: req.query.returnTo || '/'
     });
 };
 
@@ -96,7 +97,8 @@ export const postLogin = async (req: Request, res: Response) => {
         req.session.userId = user._id.toString();
 
         req.flash('success_msg', 'Connexion réussie !');
-        res.redirect('/');
+        const returnTo = req.body.returnTo || '/';
+        res.redirect(returnTo);
 
     } catch (err) {
         console.error(err);

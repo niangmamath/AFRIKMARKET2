@@ -2,44 +2,43 @@
 import express, { Router } from 'express';
 import * as AdController from '../controllers/adController'; 
 import { ensureAuthenticated } from '../middleware/authMiddleware';
-import { upload, uploadToCloudinary } from '../config/multer'; 
-import { adValidationRules } from '../validators/adValidator'; // Import our new validation rules
+// Importe le middleware de gestion de plusieurs images
+import { handleMultiUpload } from '../config/multer'; 
+import { adValidationRules } from '../validators/adValidator';
 
 const router: Router = express.Router();
 
-// Route to display the form for creating a new ad
+// Affiche le formulaire de création
 router.get('/new', ensureAuthenticated, AdController.getNewAdForm);
 
-// Route to create a new ad, now using the validation rules
+// Crée une nouvelle annonce avec le middleware de téléversement multiple
 router.post(
     '/',
     ensureAuthenticated,
-    upload.single('image'), 
-    uploadToCloudinary,    
-    adValidationRules,      // Apply the validation rules
+    handleMultiUpload, // Utilise le middleware configuré pour plusieurs images
+    adValidationRules,      
     AdController.createAd
 );
 
-// Route to get all ads
+// Affiche toutes les annonces
 router.get('/', AdController.getAds);
 
-// Route to get a single ad by its ID
+// Affiche une annonce par son ID
 router.get('/:id', AdController.getAd);
 
-// Route to display the form for editing an ad
+// Affiche le formulaire de modification
 router.get('/:id/edit', ensureAuthenticated, AdController.getEditAdForm);
 
-// Route to update an ad, now using the validation rules
+// Met à jour une annonce avec le middleware de téléversement multiple
 router.put(
     '/:id',
     ensureAuthenticated,
-    upload.single('image'), 
-    uploadToCloudinary,    
-    adValidationRules,      // Apply the validation rules
+    handleMultiUpload, // Utilise également ici pour la cohérence
+    adValidationRules,      
     AdController.updateAd
 );
 
-// Route to delete an ad
+// Supprime une annonce
 router.delete('/:id', ensureAuthenticated, AdController.deleteAd);
 
 export default router;

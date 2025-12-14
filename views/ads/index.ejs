@@ -14,8 +14,8 @@
             <% ads.forEach(ad => { %>
                 <a href="/ads/<%= ad._id %>" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out overflow-hidden">
                     <div class="h-48 bg-gray-200 flex items-center justify-center">
-                        <% if (ad.imageUrl) { %>
-                            <img src="<%= ad.imageUrl %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
+                        <% if (ad.imageUrls && ad.imageUrls.length > 0) { %>
+                            <img src="<%= ad.imageUrls[0] %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
                         <% } else { %>
                             <span class="text-gray-500">Pas d'image</span>
                         <% } %>

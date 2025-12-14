@@ -11,84 +11,75 @@
 
                 <form action="/ads" method="POST" enctype="multipart/form-data" class="mt-10 space-y-8">
                     
-                    <!-- Section 1: Détails de l'annonce -->
+                    <!-- Détails de l'annonce -->
                     <div class="space-y-6">
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700">Titre de l'annonce</label>
-                            <div class="mt-1">
-                                <input type="text" name="title" id="title" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Ex: Smartphone XYZ en excellent état" required>
-                            </div>
+                            <label for="title" class="block text-sm font-medium text-gray-700">Titre</label>
+                            <input type="text" name="title" id="title" class="block w-full rounded-md border-gray-300" required>
                         </div>
                         <div>
                             <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                            <div class="mt-1">
-                                <textarea id="description" name="description" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Décrivez votre produit en détail..." required></textarea>
-                            </div>
+                            <textarea id="description" name="description" rows="4" class="block w-full rounded-md border-gray-300" required></textarea>
                         </div>
                     </div>
 
-                    <!-- Section 2: Image -->
+                    <!-- Images avec prévisualisation -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Photo du produit</label>
-                        <!-- Zone d'aperçu de l'image -->
-                        <div id="image-preview-container" class="hidden mt-2 w-full max-w-sm mx-auto bg-gray-100 rounded-lg shadow-inner overflow-hidden">
-                            <img id="image-preview" src="#" alt="Aperçu de l'image" class="w-full h-auto object-cover"/>
+                        <label class="block text-sm font-medium text-gray-700">Photos du produit (jusqu'à 6)</label>
+                        <div id="image-preview-container" class="hidden relative mt-2 w-full max-w-sm mx-auto bg-gray-100 rounded-lg shadow-inner overflow-hidden">
+                            <img id="image-preview" src="#" alt="Aperçu de l'image principale" class="w-full h-auto object-cover"/>
+                            <div id="image-count-overlay" class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs font-semibold px-2 py-1 rounded-md"></div>
                         </div>
-                        <!-- Interface d'upload -->
                         <div id="upload-ui" class="mt-2 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
                             <div class="space-y-1 text-center">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                                 <div class="flex text-sm text-gray-600">
-                                    <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
-                                        <span>Téléchargez une image</span>
-                                        <input id="file-upload" name="image" type="file" class="sr-only" accept="image/png, image/jpeg, image/gif">
+                                    <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">
+                                        <span>Téléchargez jusqu'à 6 images</span>
+                                        <input id="file-upload" name="images" type="file" class="sr-only" accept="image/png, image/jpeg, image/gif" multiple>
                                     </label>
-                                    <p class="pl-1">ou glissez-déposez</p>
                                 </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, GIF jusqu'à 10MB</p>
                             </div>
-                        </div>
-                        <!-- Bouton pour changer l'image -->
-                        <div id="change-image-container" class="hidden text-center mt-2">
-                            <button type="button" id="change-image-btn" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Changer l'image</button>
                         </div>
                     </div>
 
-                    <!-- Section 3: Détails supplémentaires -->
+                    <!-- Détails supplémentaires -->
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                         <div>
                             <label for="price" class="block text-sm font-medium text-gray-700">Prix (MAD)</label>
-                            <div class="relative mt-1 rounded-md shadow-sm">
-                                <input type="number" name="price" id="price" class="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="0.00" required>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><span class="text-gray-500 sm:text-sm">MAD</span></div>
-                            </div>
+                            <input type="number" name="price" id="price" class="block w-full rounded-md border-gray-300" required>
                         </div>
                         <div>
                             <label for="category" class="block text-sm font-medium text-gray-700">Catégorie</label>
-                            <select id="category" name="category" class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
-                                <option>Électronique</option>
-                                <option>Vêtements & Mode</option>
-                                <option>Maison & Jardin</option>
-                                <option>Véhicules</option>
-                                <option>Immobilier</option>
-                                <option>Autres</option>
+                            <select id="category" name="category" class="mt-1 block w-full rounded-md border-gray-300">
+                                <% categories.forEach(function(category) { %>
+                                    <option value="<%= category %>"><%= category %></option>
+                                <% }); %>
                             </select>
                         </div>
                          <div>
                             <label for="location" class="block text-sm font-medium text-gray-700">Lieu</label>
-                            <input type="text" name="location" id="location" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Ex: Casablanca, Maroc" required>
+                            <input type="text" name="location" id="location" class="block w-full rounded-md border-gray-300" required>
                         </div>
                         <div>
-                            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
-                            <input type="tel" name="phoneNumber" id="phoneNumber" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="0600000000" required>
+                            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Téléphone</label>
+                            <input type="tel" name="phoneNumber" id="phoneNumber" class="block w-full rounded-md border-gray-300" required>
                         </div>
                     </div>
 
-                    <!-- Form Actions -->
+                    <!-- Champ pour le lien d'affiliation (Admin seulement) -->
+                    <% if (locals.user && locals.user.role === 'admin') { %>
+                        <div class="mt-6">
+                            <label for="affiliateLink" class="block text-sm font-medium text-gray-700">Lien d'affiliation (Optionnel)</label>
+                            <p class="text-xs text-gray-500 mb-2">Ce champ est réservé aux administrateurs.</p>
+                            <input type="url" name="affiliateLink" id="affiliateLink" placeholder="https://www.amazon.com/dp/CODE_PRODUIT?tag=votre-tag-20" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    <% } %>
+
+                    <!-- Actions -->
                     <div class="pt-5">
-                        <div class="flex justify-end gap-x-3">
-                            <a href="/ads" class="rounded-md bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Annuler</a>
-                            <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Publier l'annonce</button>
+                        <div class="flex justify-end">
+                            <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white">Créer l'annonce</button>
                         </div>
                     </div>
                 </form>
@@ -97,32 +88,45 @@
     </div>
 </div>
 
+<!-- Script pour la prévisualisation des images -->
 <script>
     const fileUpload = document.getElementById('file-upload');
     const imagePreviewContainer = document.getElementById('image-preview-container');
     const imagePreview = document.getElementById('image-preview');
     const uploadUi = document.getElementById('upload-ui');
-    const changeImageContainer = document.getElementById('change-image-container');
-    const changeImageBtn = document.getElementById('change-image-btn');
+    const imageCountOverlay = document.getElementById('image-count-overlay');
 
     fileUpload.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreviewContainer.classList.remove('hidden');
-                uploadUi.classList.add('hidden');
-                changeImageContainer.classList.remove('hidden');
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            // Limite à 6 fichiers
+            if (files.length > 6) {
+                alert('Vous ne pouvez télécharger que 6 images au maximum.');
+                // Réinitialiser l'input
+                fileUpload.value = ''; 
+                return;
             }
-            
-            reader.readAsDataURL(file);
-        }
-    });
 
-    changeImageBtn.addEventListener('click', function() {
-        fileUpload.click(); // Ouvre la boîte de dialogue de fichier
+            const firstFile = files[0];
+            if (firstFile && firstFile.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                    uploadUi.classList.add('hidden');
+                    
+                    // Affiche le nombre d'images supplémentaires
+                    if (files.length > 1) {
+                        imageCountOverlay.textContent = `+ ${files.length - 1}`;
+                    } else {
+                        imageCountOverlay.textContent = '';
+                    }
+                }
+                
+                reader.readAsDataURL(firstFile);
+            }
+        }
     });
 </script>
 

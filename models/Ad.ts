@@ -8,7 +8,10 @@ export interface IAd extends Document {
     description: string;
     price: number;
     category: string;
+    imageUrls: string[];
     imageUrl?: string;
+    affiliateLink?: string; // Ajout du champ pour le lien d'affiliation
+    imageFilenames: string[];
     imageFilename?: string;
     author: Types.ObjectId | Record<string, unknown>;
     createdAt: Date;
@@ -16,6 +19,7 @@ export interface IAd extends Document {
     status: 'pending' | 'approved' | 'rejected';
     location: string;
     phoneNumber: string;
+    displayImage: string; // Propriété virtuelle
 }
 
 const AdSchema = new Schema<IAd>({
@@ -23,8 +27,11 @@ const AdSchema = new Schema<IAd>({
     description: { type: String, required: true },
     price: { type: Number, required: true },
     category: { type: String, required: true },
-    imageUrl: { type: String, required: false },
-    imageFilename: { type: String, required: false },
+    imageUrls: [{ type: String }],
+    imageUrl: { type: String },
+    affiliateLink: { type: String, trim: true }, // Ajout au schéma
+    imageFilenames: [{ type: String }],
+    imageFilename: { type: String },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     status: {
         type: String,
@@ -34,13 +41,26 @@ const AdSchema = new Schema<IAd>({
     },
     location: { type: String, required: true },
     phoneNumber: { type: String, required: true },
-}, { timestamps: true });
+}, { 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Définition de la propriété virtuelle
+AdSchema.virtual('displayImage').get(function() {
+    if (this.imageUrls && this.imageUrls.length > 0) {
+        return this.imageUrls[0];
+    }
+    if (this.imageUrl) {
+        return this.imageUrl;
+    }
+    return 'https://via.placeholder.com/300x200.png?text=Pas+d\'image';
+});
 
 // Appliquer le plugin de pagination au schéma
 AdSchema.plugin(mongoosePaginate);
 
-// L'astuce est de faire un "cast" du modèle pour inclure le type de pagination
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Ad = model<IAd, mongoose.PaginateModel<IAd>>('Ad', AdSchema, "ads" as any);
+const Ad = model<IAd, mongoose.PaginateModel<IAd>>('Ad', AdSchema);
 
 export default Ad;

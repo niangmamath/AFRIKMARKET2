@@ -68,14 +68,31 @@ router.post('/blog', ensureAuthenticated, ensureAdmin, blogController.createBlog
 // @access  Private (Admin)
 router.get('/blog/:id/edit', ensureAuthenticated, ensureAdmin, blogController.getEditBlogPostForm);
 
-// @desc    Mettre à jour un article
+// @desc    Mettre à jour un article (via formulaire)
 // @route   POST /admin/blog/:id/edit
 // @access  Private (Admin)
 router.post('/blog/:id/edit', ensureAuthenticated, ensureAdmin, blogController.updateBlogPost);
 
-// @desc    Supprimer un article
-// @route   DELETE /admin/blog/:id
+// @desc    Supprimer un article (via formulaire)
+// @route   POST /admin/blog/:id/delete
 // @access  Private (Admin)
 router.post('/blog/:id/delete', ensureAuthenticated, ensureAdmin, blogController.deleteBlogPost);
+
+
+// --- Gestion des Témoignages ---
+// @desc    Page de gestion des témoignages
+// @route   GET /admin/testimonials
+// @access  Private (Admin)
+router.get('/testimonials', ensureAuthenticated, ensureAdmin, adminController.getTestimonialsPage);
+
+// @desc    Créer un nouveau témoignage
+// @route   POST /admin/testimonials
+// @access  Private (Admin)
+router.post('/testimonials', ensureAuthenticated, ensureAdmin, adminController.createTestimonial);
+
+// @desc    Supprimer un témoignage
+// @route   DELETE /admin/testimonials/:id
+// @access  Private (Admin)
+router.delete('/testimonials/:id', ensureAuthenticated, ensureAdmin, adminController.deleteTestimonial);
 
 export default router;
