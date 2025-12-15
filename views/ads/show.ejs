@@ -75,7 +75,11 @@
           <% if (ad.affiliateLink) { %>
             <!-- CAS 1: Annonce d'affiliation -->
             <div class="mt-10 text-center">
-              <a href="<%= ad.affiliateLink %>" target="_blank" rel="noopener noreferrer" class="w-full bg-green-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+              <a href="<%= ad.affiliateLink %>" 
+                 target="_blank" 
+                 rel="noopener noreferrer" 
+                 onclick="gtag('event', 'click_amazon', { 'event_category': 'Affiliation', 'event_label': '<%= ad.title %>', 'value': '<%= ad.price %>' });"
+                 class="w-full bg-green-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                 Acheter sur Amazon
               </a>
               <p class="mt-2 text-xs text-gray-500">
@@ -91,7 +95,9 @@
                 </a>
               <% } else if (locals.user && !isAuthor) { %>
                 <% if (ad.phoneNumber) { %>
-                  <a href="tel:<%= ad.phoneNumber %>" class="w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  <a href="tel:<%= ad.phoneNumber %>" 
+                     onclick="gtag('event', 'click_call', { 'event_category': 'Contact Vendeur', 'event_label': '<%= ad.title %>' });"
+                     class="w-full bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.518.758a10.024 10.024 0 006.46 6.46l.758-1.518a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
                       Appeler le vendeur
                   </a>
