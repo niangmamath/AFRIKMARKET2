@@ -6,23 +6,30 @@
     <title><%= typeof title !== 'undefined' ? title + ' | AfrikMarket' : 'AfrikMarket | Petites Annonces au Sénégal' %></title>
     
     <!-- SEO & Social Sharing -->
-    <meta name="description" content="<%= typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Achetez et vendez tout au Sénégal : voitures, immobilier, smartphones, et plus encore. Publiez votre annonce gratuitement sur AfrikMarket.' %>">
+    <% const adDescription = typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Achetez et vendez tout au Sénégal : voitures, immobilier, smartphones, et plus encore. Publiez votre annonce gratuitement sur AfrikMarket.'; %>
+    <% const adTitle = typeof title !== 'undefined' ? title : 'AfrikMarket'; %>
+    <% const adImage = typeof ad !== 'undefined' && ad.imageUrls && ad.imageUrls.length > 0 ? ad.imageUrls[0] : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png'; %>
+    
+    <meta name="description" content="<%= adDescription %>">
     <meta name="keywords" content="<%= typeof keywords !== 'undefined' ? keywords : 'petites annonces, Sénégal, dakar, vendre, acheter, gratuit' %>">
 
     <!-- Open Graph (pour Facebook, WhatsApp, etc.) -->
-    <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'AfrikMarket' %>">
-    <meta property="og:description" content="<%= typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Le meilleur site de petites annonces au Sénégal pour trouver les meilleures offres.' %>">
-    <meta property="og:image" content="<%= typeof ad !== 'undefined' && ad.imageUrls && ad.imageUrls.length > 0 ? ad.imageUrls[0] : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>">
+    <meta property="og:title" content="<%= adTitle %>">
+    <meta property="og:description" content="<%= adDescription %>">
     <meta property="og:url" content="<%= 'https://afrikmarket.shop' + (typeof req !== 'undefined' ? req.originalUrl : '') %>">
-    <meta property="og:type" content="<%= typeof ad !== 'undefined' ? 'product' : 'website' %>">
     <meta property="og:site_name" content="AfrikMarket">
+    <meta property="og:type" content="<%= typeof ad !== 'undefined' ? 'product' : 'website' %>">
+    <meta property="og:image" content="<%= adImage %>">
+    <meta property="og:image:secure_url" content="<%= adImage %>">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="800">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="<%= typeof title !== 'undefined' ? title : 'AfrikMarket' %>">
-    <meta name="twitter:description" content="<%= typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Le meilleur site de petites annonces au Sénégal.' %>">
-    <meta name="twitter:image" content="<%= typeof ad !== 'undefined' && ad.imageUrls && ad.imageUrls.length > 0 ? ad.imageUrls[0] : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>">
     <meta name="twitter:site" content="@AfrikMarket">
+    <meta name="twitter:title" content="<%= adTitle %>">
+    <meta name="twitter:description" content="<%= adDescription %>">
+    <meta name="twitter:image" content="<%= adImage %>">
 
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
