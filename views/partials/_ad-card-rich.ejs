@@ -1,22 +1,45 @@
-<a href="/ads/<%= ad._id %>" class="block bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out overflow-hidden">
-    <div class="h-48 bg-gray-200 flex items-center justify-center">
-        <% if (ad.imageUrls && ad.imageUrls.length > 0) { %>
-            <img src="<%= ad.imageUrls[0] %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
-        <% } else { %>
-             <img src="https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png" alt="Image par défaut" class="h-full w-full object-cover">
-        <% } %>
-    </div>
-    <div class="p-6">
-        <h2 class="text-xl font-semibold text-gray-800 truncate" title="<%- ad.title %>"><%- ad.title %></h2>
-        <p class="text-2xl font-bold text-indigo-600 my-2"><%= ad.price.toLocaleString('fr-FR') %> MAD</p>
-        <% if (ad.location) { %>
-            <p class="text-sm text-gray-600 flex items-center mt-3">
-                <svg class="h-4 w-4 mr-1.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                <%= ad.location %>
-            </p>
-        <% } %>
-        <div class="border-t border-gray-200 mt-4 pt-4">
+<div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out overflow-hidden flex flex-col justify-between">
+    <!-- Lien principal pour l'image et le titre -->
+    <a href="/ads/<%= ad._id %>" class="block">
+        <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <% if (ad.imageUrls && ad.imageUrls.length > 0) { %>
+                <img src="<%= ad.imageUrls[0] %>" alt="<%- ad.title %>" class="h-full w-full object-cover">
+            <% } else { %>
+                 <img src="https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png" alt="Image par défaut" class="h-full w-full object-cover">
+            <% } %>
+        </div>
+        <div class="p-6">
+            <h2 class="text-xl font-semibold text-gray-800 truncate" title="<%- ad.title %>"><%- ad.title %></h2>
+            <p class="text-2xl font-bold text-indigo-600 my-2"><%= ad.price.toLocaleString('fr-FR') %> MAD</p>
+            <% if (ad.location) { %>
+                <p class="text-sm text-gray-600 flex items-center mt-3">
+                    <svg class="h-4 w-4 mr-1.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                    <%= ad.location %>
+                </p>
+            <% } %>
+        </div>
+    </a>
+    
+    <!-- Section Auteur et Partage -->
+    <div class="border-t border-gray-200 px-6 py-4">
+        <div class="flex justify-between items-center">
             <p class="text-xs text-gray-500">Posté par <span class="font-medium text-gray-600"><%= ad.author ? ad.author.username : 'Utilisateur inconnu' %></span></p>
+            
+            <!-- Icônes de partage -->
+            <div class="flex items-center space-x-2">
+                <button class="share-btn" data-network="copy" data-url="/ads/<%= ad._id %>" title="Copier le lien">
+                    <svg class="h-5 w-5 text-gray-400 hover:text-indigo-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+                <a href="#" class="share-btn" data-network="facebook" data-url="/ads/<%= ad._id %>" data-title="<%- ad.title %>" title="Partager sur Facebook">
+                     <svg class="h-5 w-5 text-gray-400 hover:text-blue-600 transition-colors duration-200" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path></svg>
+                </a>
+                <a href="#" class="share-btn" data-network="twitter" data-url="/ads/<%= ad._id %>" data-title="<%- ad.title %>" title="Partager sur Twitter">
+                    <svg class="h-5 w-5 text-gray-400 hover:text-sky-500 transition-colors duration-200" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.298 1.634 4.212 3.792 4.653-.502.136-1.03.196-1.564.196-.304 0-.6-.03- .89-.084.629 1.956 2.445 3.379 4.6 3.419-2.07 1.623-4.678 2.588-7.52 2.588-.487 0-.968-.028-1.441-.084 2.684 1.728 5.873 2.748 9.28 2.748 8.44 0 12.55-7.53 11.97-13.565 1.053-.768 1.96-1.724 2.683-2.798z"></path></svg>
+                </a>
+                 <a href="#" class="share-btn" data-network="whatsapp" data-url="/ads/<%= ad._id %>" data-title="<%- ad.title %>" title="Partager sur WhatsApp">
+                    <svg class="h-5 w-5 text-gray-400 hover:text-green-500 transition-colors duration-200" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.886-.001 2.269.655 4.547 1.916 6.44l-1.277 4.665 4.759-1.249zM9.354 8.014c-.195-.538-.135-.994.027-1.151.162-.157.348-.207.466-.207.119 0 .261.015.382.029.14.017.29.09.431.33.142.24.466.83.518 1.018.052.187.087.357.031.526-.057.17-.119.288-.238.406-.119.119-.24.195-.33.282-.09.088-.173.15-.27.246-.098.096-.18.173-.125.292.055.119.261.466.504.709.324.324.73.59 1.1.758.293.132.443.118.571.045.128-.073.348-.392.437-.538.089-.145.178-.17.305-.17.128 0 .428.09.52.178.09.088.134.392.146.494.012.102.008.437-.03.526-.038.089-.27.188-.487.234-.217.046-.475.043-.658.026-.183-.018-.443-.083- .729-.207-.49-.22-1.037-.53-1.504-.907-.636-.508-1.07-1.147-1.232-1.449-.162-.302-.324-.493-.437-.538-.113-.045-.24-.045-.33-.016z"></path></svg>
+                </a>
+            </div>
         </div>
     </div>
-</a>
+</div>
