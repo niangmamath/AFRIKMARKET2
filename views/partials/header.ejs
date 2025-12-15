@@ -4,13 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title + ' | AfrikMarket' : 'AfrikMarket | Petites Annonces au Sénégal' %></title>
-    <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Achetez et vendez tout au Sénégal : voitures, immobilier, smartphones, et plus encore. Publiez votre annonce gratuitement sur AfrikMarket.' %>">
+    
+    <!-- SEO & Social Sharing -->
+    <meta name="description" content="<%= typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Achetez et vendez tout au Sénégal : voitures, immobilier, smartphones, et plus encore. Publiez votre annonce gratuitement sur AfrikMarket.' %>">
     <meta name="keywords" content="<%= typeof keywords !== 'undefined' ? keywords : 'petites annonces, Sénégal, dakar, vendre, acheter, gratuit' %>">
+
+    <!-- Open Graph (pour Facebook, WhatsApp, etc.) -->
     <meta property="og:title" content="<%= typeof title !== 'undefined' ? title : 'AfrikMarket' %>">
-    <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Le meilleur site de petites annonces au Sénégal.' %>">
-    <meta property="og:image" content="<%= typeof imageUrl !== 'undefined' ? imageUrl : '/images/og-image.jpg' %>">
-    <meta property="og:url" content="<%= 'https://afrikmarket.sn' + (typeof req !== 'undefined' ? req.originalUrl : '') %>">
-    <meta property="og:type" content="website">
+    <meta property="og:description" content="<%= typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Le meilleur site de petites annonces au Sénégal pour trouver les meilleures offres.' %>">
+    <meta property="og:image" content="<%= typeof ad !== 'undefined' && ad.imageUrls && ad.imageUrls.length > 0 ? ad.imageUrls[0] : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>">
+    <meta property="og:url" content="<%= 'https://afrikmarket.shop' + (typeof req !== 'undefined' ? req.originalUrl : '') %>">
+    <meta property="og:type" content="<%= typeof ad !== 'undefined' ? 'product' : 'website' %>">
+    <meta property="og:site_name" content="AfrikMarket">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= typeof title !== 'undefined' ? title : 'AfrikMarket' %>">
+    <meta name="twitter:description" content="<%= typeof ad !== 'undefined' && ad.description ? ad.description.substring(0, 160) : 'Le meilleur site de petites annonces au Sénégal.' %>">
+    <meta name="twitter:image" content="<%= typeof ad !== 'undefined' && ad.imageUrls && ad.imageUrls.length > 0 ? ad.imageUrls[0] : 'https://res.cloudinary.com/dlqwxsufy/image/upload/v1716909471/placeholder_y4bnto.png' %>">
+    <meta name="twitter:site" content="@AfrikMarket">
+
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,7 +32,6 @@
     <style>
         [x-cloak] { display: none !important; }
     </style>
-
 </head>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
 
