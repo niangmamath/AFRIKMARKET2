@@ -1,6 +1,6 @@
 <div class="relative flex flex-col rounded-lg shadow-lg overflow-hidden transition-transform transform hover:-translate-y-1">
     <a href="/ads/<%= ad._id %>" class="block">
-        <img class="h-48 w-full object-cover" src="<%- ad.imageUrl %>" alt="Image pour <%= ad.title %>">
+        <img class="h-48 w-full object-cover" src="<%= ad.imageUrls[0] || '/images/placeholder.png' %>" alt="Image pour <%= ad.title %>">
     </a>
     <div class="flex-1 bg-white p-4 flex flex-col justify-between">
         <div>
